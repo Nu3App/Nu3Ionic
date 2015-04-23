@@ -1,0 +1,13 @@
+<ion-view view-title="Photolists">
+  <ion-content>
+  	<button class="button button-full button-energized" ng-click="loadList()">
+  	Carregar Mais Refeições
+	</button>
+    <ion-list>
+      <ion-item ng-repeat="photo in photolists" href="#/app/photolists/{{photo.id}}">
+        <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+        <label>{{photo.date}} <strong>{{photo.title}}</strong></label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

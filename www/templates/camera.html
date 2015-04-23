@@ -1,0 +1,12 @@
+<ion-view view-title="Camera">
+  <ion-content ng-controller="PictureCtrl">
+  		<label>Qual a sua refeição?</label>
+  		<input name="titulo" ng-model="photoTitle" type="text" placeholder="Descrava seu prato rapidamente..." />
+    	<p id="warning" class="hidden error-message">Por favor, insira um título.</p>
+        <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
+        <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
+        <button class="button" ng-click="takePicture()">Take Picture</button>
+        <button ng-show="imgURI !== undefined" class="button" ng-click="savePicture()">Salvar</button>
+        <label ng-show="dbResult !== undefined">{{dbResult}}</label>
+    </ion-content>
+</ion-view>
