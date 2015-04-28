@@ -1,12 +1,28 @@
 <ion-view view-title="Camera">
   <ion-content ng-controller="PictureCtrl">
-  		<label>Qual a sua refeição?</label>
-  		<input name="titulo" ng-model="photoTitle" type="text" placeholder="Descrava seu prato rapidamente..." />
-    	<p id="warning" class="hidden error-message">Por favor, insira um título.</p>
+    <div class="list">
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Qual é a sua refeição?</span>
+        <input type="text" ng-model="photoTitle" placeholder="Descrava seu prato rapidamente...">
+      </label>
+    </div>
+      <div class="card" ng-show="blankTitle === true" class="error-message">
+        <div class="item item-text-wrap">
+          Por favor, descreva sua refeição.
+        </div>
+      </div>
         <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
         <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
         <button class="button" ng-click="takePicture()">Take Picture</button>
         <button ng-show="imgURI !== undefined" class="button" ng-click="savePicture()">Salvar</button>
-        <label ng-show="dbResult !== undefined">{{dbResult}}</label>
+
+        <div class="card" ng-show="dbResult !== undefined" class="error-message">
+          <div class="item item-divider">
+            Resultado: 
+          </div>
+          <div class="item item-text-wrap">
+            {{dbResult}}
+          </div>
+        </div>
     </ion-content>
 </ion-view>

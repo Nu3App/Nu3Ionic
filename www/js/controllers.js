@@ -45,15 +45,108 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('PhotolistsCtrl', function($scope,$rootScope, $cordovaSQLite, $ionicModal, DBService) {
-  
-  console.log ("User: " + JSON.stringify(user));
+.controller('PhotolistsCtrl', function($scope,$rootScope,$state, DBService, FeedService, ImagensServices) {
+  var today = Date.today().add(1).days();
+  var lastSunday = Date.parse("last sunday");
+  var beginningDate = Date.parse("last sunday");
+  var endingDate = Date.today().add(1).days();
+  $scope.feed = [];
+
+  DBService.getUser().then(function(){
+    ConstructFeed();
+  });
+   function ConstructFeed(){
+    ImagensServices.recuperaImagemData(lastSunday, today).then(
+        function onFulfilled(ajaxData){
+          console.log("AJAX promise fulfulled!");
+          prepareFeed(ajaxData).then(function(){
+            console.log("Feed construido!");
+          });
+
+        },
+        function onRejected(reason){
+          console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
+        }
+    );
+  }
+
+  function ConstructExtraWeekFeed(){
+    endingDate = beginningDate.clone();
+    beginningDate = beginningDate.addWeeks(-1);
+      ImagensServices.recuperaImagemData(beginningDate, endingDate).then(
+        function onFulfilled(ajaxData){
+          console.log("AJAX promise fulfulled!");
+          prepareFeed(ajaxData);
+
+        },
+        function onRejected(reason){
+          console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
+        }
+    );
+  }
+  function prepareFeed(imagensData){
+    var deferred = Q.defer();
+    console.log("Preparando Feed...");
+    if(imagensData && imagensData.length > 0){
+      console.log("Semana não vazia:");
+      var previousWeekend = null;
+      var imagePromises = []; //Array de promeças para cada imagem carregada no loop
+
+      for (var i = imagensData.length - 1; i>=0; i--){
+        console.log("Getting index " + i + " data...");
+        //idImagem , nome, data, rating, descricao, ultimoComentario (idComentario, nomeUsuario, texto, dataEnvio)
+        var returnedValues = FeedService.buildPhotoJson(imagensData[i], previousWeekend);
+        var json = returnedValues[0];
+        previousWeekend = returnedValues[1];
+        console.log("Pre-json builded!");
+
+        //precisa fazer uma promisse para carregar o base64 do SQLite
+        json["index"] = i;
+        var basePromise = FeedService.findPhotoBase(json).then(
+          function onFulfilled(json){
+            console.log("Achou a foto? Finally!!!  " + json["idImagem"]);
+            console.log("Imagem: " + JSON.stringify(json));
+            json['url'] = 'data:image/png;base64,' + json.base64;
+            $scope.feed.push(json);
+            $scope.$digest();
+          },
+          function onRejected(reason){
+            console.log("Algo deu errado...");
+          }
+        );
+        imagePromises.push(basePromise); //adiciona no array de promeças, a promeça que eventualmente essa foto sera carregada.
+        
+      }//End -> for
+      Q.all(imagePromises).then(function(){
+        console.log("Todas as promessas do feed foram cumpridas...");
+        //Todas promessas foram compridas, então resolva a promessa do conjunto todo:
+        deferred.resolve(true);
+      });
+
+    }
+    else{ //semana vazia, ou seja, sem feed algum
+      console.log("Semana vazia...");
+      console.log("Scopo: " + $scope.feed);
+      var week = {
+        "emptyWeek": true,
+        "date": ("0" + beginningDate.getDate()).slice(-2) + "/" + ("0" + (beginningDate.getMonth() + 1)).slice(-2)  
+      }
+      $scope.feed.push(week);
+      console.log("Scope : " + JSON.stringify($scope.feed));
+      $scope.$digest();
+      deferred.resolve(true);
+    } 
+    return deferred.promise;
+
+  }
   $scope.loadList = function() {
       //var imgURI = $scope.imgURI;
       //console.log("Img URI: " + imgURI);
       //var base64 = getBase64FromImageUrl(imgURI);
       //var id = Date.now();
-      $scope.photolists = [];
+      ConstructExtraWeekFeed();
+
+      /*$scope.photolists = [];
       var query = "SELECT * FROM photos";
       $cordovaSQLite.execute(db, query).then(function(res) {
           if(res.rows.length > 0) {
@@ -75,7 +168,11 @@ angular.module('starter.controllers', [])
           }
       }, function (err) {
           console.error(err);
-      });
+      });*/
+    }
+
+    $scope.camera = function(){
+      $state.go('app.camera');
     }
 
 })
@@ -95,14 +192,13 @@ angular.module('starter.controllers', [])
     AuthenticationService.login($scope.user).then(
         function onFulfilled(result){
           console.log("Usuario logado: " + result.idUsuario);
-          result.email = $scope.username;
+          result.email = $scope.user.email;
           user = result;
-         $scope.username = null;
-         $scope.password = null;
+         $scope.user.senha = null;
          
          DBService.insertUser(result).then(function(){
             console.log("Dados do usuário inseridos no banco de dados...");
-            $state.go('/app/photolists');
+            $state.go('app.photolists');
          });
         },
         function onRejected(reason, status){
@@ -121,4 +217,102 @@ angular.module('starter.controllers', [])
     console.log('handling login required');
     $scope.loginModal.show();
   });*/  
+})
+
+.controller("PictureCtrl", function($scope, $cordovaCamera, $cordovaSQLite, DBService, ImagensServices) {
+    $scope.savePicture = function() {
+      if(!$scope.photoTitle){
+        $scope.blankTitle = true;
+      }
+      else{
+        $scope.blankTitle = false;
+        var imgURI = $scope.imgURI;
+        console.log("Img URI: " + imgURI);
+        getBase64FromImageUrl(imgURI); 
+      }
+      
+    }
+
+    $scope.takePicture = function() {
+        var options = { 
+            quality : 75, 
+            destinationType : Camera.DestinationType.IMAGE_URI, 
+            sourceType : Camera.PictureSourceType.CAMERA, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+ 
+        $cordovaCamera.getPicture(options).then(function(imageData) {
+            //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+            $scope.imgURI = imageData;
+        }, function(err) {
+            // An error occured. Show a message to the user
+        });
+    }
+
+    function getBase64FromImageUrl(URL) {
+      encodeImageUri(URL, function(base64){
+         var id = Date.now();
+         var image = {
+          'idImagem': id, 
+          'nome': $scope.photoTitle, 
+          'base64': base64,
+          'data': new Date().setTimeToNow(), 
+          'rating': 0
+         }
+        ImagensServices.criaImagem(image.nome, base64).then(
+          function onSuccess(id){
+            console.log("Imagem criada no servidor com id: " + id);
+            image.idImagem = id;
+            DBService.addPhoto(image, base64, 1).then(
+              function onSuccess(){
+                  $scope.dbResult = "Imagem salva e sincronizada com sucesso!";
+                  $scope.$digest();
+              },
+              function onError(){
+                  $scope.dbResult = "Falha, tente novamente";
+                  $scope.$digest();
+              }
+            );
+          },
+          function onError(err){
+            DBService.addPhoto(image, base64, 0).then(
+              function onSuccess(){
+                  $scope.dbResult = "Imagem salva localmente com sucesso!";
+                  $scope.$digest();
+              },
+              function onError(){
+                  $scope.dbResult = "Falha, tente novamente";
+                  $scope.$digest();
+              }
+            );
+          }
+        );
+      });
+    }
+
+    encodeImageUri = function(imageUri, callback) {
+      var c = document.createElement('canvas');
+      var ctx = c.getContext("2d");
+      var img = new Image();
+      img.onload = function() {
+          c.width = this.width;
+          c.height = this.height;
+          ctx.drawImage(img, 0, 0);
+
+          if(typeof callback === 'function'){
+              var dataURL = c.toDataURL("image/png");
+              //console.log("DataURL original: " + dataURL);
+              callback(dataURL.slice(22, dataURL.length));
+          }
+      };
+      img.src = imageUri;
+    }
+
+    
+ 
 });

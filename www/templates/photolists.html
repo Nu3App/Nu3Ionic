@@ -1,13 +1,40 @@
-<ion-view view-title="Photolists">
+<ion-view view-title="Home">
   <ion-content>
-  	<button class="button button-full button-energized" ng-click="loadList()">
-  	Carregar Mais Refeições
-	</button>
     <ion-list>
-      <ion-item ng-repeat="photo in photolists" href="#/app/photolists/{{photo.id}}">
-        <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
-        <label>{{photo.date}} <strong>{{photo.title}}</strong></label>
+      <ion-item ng-repeat="photo in feed" href="#/app/photolists/{{photo.id}}" class="padding-five">
+        
+        
+        <label ng-show="photo.emptyWeek"><center>Semana sem Coletas: {{photo.date}}</center></label>
+        <div class="row row-center" ng-show="photo.nome !== undefined">
+          <div class="col col-33"><img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list"></div>
+          <div class="col col-67">
+            <div class = "row row-center">
+              <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+              <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+            </div>
+            <div class = "row row-center">
+              <label ng-show="photo.nome !== undefined"><strong>{{photo.nome}}</strong></label>
+            </div>
+            <div class = "row row-center">
+              <label>{{photo.data}}</label>
+            </div>
+          </div>
+          
+        </div>
+
       </ion-item>
     </ion-list>
+    <button class="button button-full button-energized" ng-click="loadList()">
+    Carregar Mais Refeições
+    </button>
   </ion-content>
+  <ion-footer-bar align-title="center" class="bar-energized">
+  <div class="buttons">
+    <button class="button icon-left ion-home">Home</button>
+  </div>
+  <h1 class="title">Nu3 App</h1>
+  <div class="buttons">
+    <button class="button icon-left ion-camera" ng-click="camera()">Camera</button>
+  </div>
+  </ion-footer-bar>
 </ion-view>

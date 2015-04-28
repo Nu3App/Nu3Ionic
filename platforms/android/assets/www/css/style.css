@@ -16,11 +16,15 @@
 	border-radius: 3px;
 	border-width: 3px;
 	display: block;
-	max-width: 30%;
+	max-width: 100%;
 	width: 100px;
 	height: 100px;
 }
 
 .hidden{
   display: none;
+}
+
+.padding-five {
+    padding: 5px !important;
 }
