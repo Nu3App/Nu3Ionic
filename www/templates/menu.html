@@ -12,24 +12,25 @@
     <ion-nav-view name="menuContent"></ion-nav-view>
   </ion-side-menu-content>
 
-  <ion-side-menu side="left">
+  <ion-side-menu side="left" width="150">
     <ion-header-bar class="bar-stable">
-      <h1 class="title">Left</h1>
+      <h1 class="title">Nu3 App Menu</h1>
     </ion-header-bar>
     <ion-content>
+      <ion-item nav-clear menu-close href="#/app/playlists">
+         <i class="icon ion-home"></i> Home
+        </ion-item>
       <ion-list>
-        <ion-item nav-clear menu-close href="#/login">
-          Login
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/camera">
-          Camera
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/browse">
-          Browse
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/playlists">
-          Playlists
-        </ion-item>
+      <ion-item nav-clear menu-close href="#/app/camera">
+        <i class="icon ion-camera"></i> Camera
+      </ion-item>
+      <ion-item nav-clear menu-close href="#/app/about">
+        <i class="icon ion-help-circled"></i> Sobre
+      </ion-item>
+      <ion-item nav-clear menu-close href="#/login">
+        <i class="icon ion-log-out"></i> Logout
+      </ion-item>
+        
       </ion-list>
     </ion-content>
   </ion-side-menu>

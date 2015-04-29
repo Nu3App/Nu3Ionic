@@ -62,11 +62,11 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
     }
   })
 
-  .state('app.browse', {
-    url: "/browse",
+  .state('app.about', {
+    url: "/about",
     views: {
       'menuContent': {
-        templateUrl: "templates/browse.html"
+        templateUrl: "templates/about.html"
       }
     }
   })
@@ -80,14 +80,21 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       }
     })
 
-  .state('app.single', {
-    url: "/photolists/:photoId",
+  .state('app.details', {
+    url: "/photolists/:id",
+    
     views: {
       'menuContent': {
         templateUrl: "templates/photo.html",
         controller: 'PhotoCtrl'
       }
-    }
+    }/*,
+    resolve: {
+          details: function($stateParams, DetailsService) {
+            console.log("Resolving: " + $stateParams.photoId);
+            return DetailsService.getDetail($stateParams.photoId)
+          }
+    }*/
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/photolists');

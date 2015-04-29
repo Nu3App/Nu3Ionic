@@ -281,12 +281,6 @@ angular.module('nu3.services', [])
       return AJAXservice(url, dataE, "Recupera Imagem Data: ");
 
     },
-    recuperaComentarios: function(imagemID, token){
-      var dataE = {"token" : user.token, "idImagem" : image.ID};
-      var url = urlService + "comment/obtemComentarios";
-      return AJAXservice(url, dataE, "Recupera Comentarios: ");
-
-    },
     recuperaImagem: function(imagemID, token){
       var dataE = {"token" : user.token, "idImagem" : imagemID};
       console.log("Recupera Imagem Data: " + JSON.stringify(dataE));
@@ -294,7 +288,15 @@ angular.module('nu3.services', [])
       //return AJAXservice(url, dataE, "Recupera Imagem: ");
       return AJAXtextService(url, dataE, "Obtem Imagem: ");
     },
-    criaComentario: function(imagemID, comentario, token){
+    recuperaComentarios: function(imagemID){
+      var dataE = {"token" : user.token, "idImagem" : imagemID};
+      var url = urlService + "comment/obtemComentarios";
+      return AJAXservice(url, dataE, "Recupera Comentarios: ");
+    },
+    criaComentario: function(imagemID, comentario){
+      var dataE = {"token" : user.token, "idImagem" : imagemID, "comentarioText" : comentario };
+      var url = urlService + "comment/criaComentario";
+      return AJAXservice(url, dataE, "Cria Comentario: ");
     },
     criaImagem: function(title, base64){
       var url = urlService + "image/criaImagem";
@@ -396,5 +398,22 @@ angular.module('nu3.services', [])
       );
       return deferred.promise;
     }
+  }
+})
+
+.service('DetailsService', function($scopeParams, DBService) {
+  return {
+    getDetail: function(id) {
+      console.log("Procurando detalhes de : " + id);
+      var deferred = Q.defer()
+      DBService.loadPhoto(photoID).then(
+      function(result){
+          console.log("Dados carregados do banco de dados");
+          deferred.resolve(result);
+        }
+      )
+      return deferred.promise
+    }
+
   }
 })

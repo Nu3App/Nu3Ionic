@@ -1,6 +1,19 @@
 <ion-view view-title="Camera">
   <ion-content ng-controller="PictureCtrl">
-    <div class="list">
+    <div class="card" ng-show="dbResult !== undefined" class="error-message">
+      <div class="item item-divider">
+        Resultado: 
+      </div>
+      <div class="item item-text-wrap">
+        {{dbResult}}
+      </div>
+      <div class="item item-divider">
+        <button class="button button-full icon icon-left ion-home button-clear button-dark " ng-click="reloadHome()">
+          Voltar para Home
+        </button>
+      </div>
+      </div>
+    <div ng-hide="dbResult !== undefined" class="list">
       <label class="item item-input item-stacked-label">
         <span class="input-label">Qual é a sua refeição?</span>
         <input type="text" ng-model="photoTitle" placeholder="Descrava seu prato rapidamente...">
@@ -13,16 +26,9 @@
       </div>
         <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
         <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
-        <button class="button" ng-click="takePicture()">Take Picture</button>
-        <button ng-show="imgURI !== undefined" class="button" ng-click="savePicture()">Salvar</button>
+        <button class="button" ng-hide="dbResult !== undefined" ng-click="takePicture()">Take Picture</button>
+        <button ng-show="imgURI !== undefined"  ng-hide="dbResult !== undefined" class="button" ng-click="savePicture()">Salvar</button>
 
-        <div class="card" ng-show="dbResult !== undefined" class="error-message">
-          <div class="item item-divider">
-            Resultado: 
-          </div>
-          <div class="item item-text-wrap">
-            {{dbResult}}
-          </div>
-        </div>
+        
     </ion-content>
 </ion-view>

@@ -52,6 +52,11 @@ angular.module('starter.controllers', [])
   var endingDate = Date.today().add(1).days();
   $scope.feed = [];
 
+  $rootScope.$on('todo:listChanged', function() {
+    $scope.feed = [];
+    ConstructFeed();
+  });
+
   DBService.getUser().then(function(){
     ConstructFeed();
   });
@@ -105,7 +110,7 @@ angular.module('starter.controllers', [])
         var basePromise = FeedService.findPhotoBase(json).then(
           function onFulfilled(json){
             console.log("Achou a foto? Finally!!!  " + json["idImagem"]);
-            console.log("Imagem: " + JSON.stringify(json));
+            //console.log("Imagem: " + JSON.stringify(json));
             json['url'] = 'data:image/png;base64,' + json.base64;
             $scope.feed.push(json);
             $scope.$digest();
@@ -177,7 +182,77 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('PhotoCtrl', function($scope, $stateParams) {
+.controller('PhotoCtrl', function($scope, $stateParams, DBService, $ionicLoading, ImagensServices) {
+  console.log("detalhes: " + JSON.stringify($stateParams));
+  $ionicLoading.show({
+      content: 'Carregando Detalhes',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 300
+  });
+
+  $scope.commentField = {
+    text: ''
+  }
+
+  $scope.comentar = function(){
+    var commentText = $scope.commentField.text;
+    console.log("Criando comentario> " + commentText +  " trim> " + commentText.trim());
+    commentText = commentText.trim();
+    if(commentText.length > 0){
+      $scope.warning = null;
+      ImagensServices.criaComentario($stateParams.id, commentText).then(
+        function onSuccess(){
+          console.log("Comentario Salvo com Sucesso! " + new Date().toString("hh:mm"));
+          $scope.commentField.text = "";
+          var comment = {
+            'dataEnvio' : "Agora às " + new Date().toString("hh:mm"),
+            'nomeUsuario' : user.username,
+            'texto': commentText
+          }
+          $scope.comentarios.push(comment);
+          $scope.$digest();
+        },
+        function onError(){
+          //ToDO Display Error Notification
+        }
+      );
+    }
+    else{
+      $scope.warning = true;
+    }
+    
+  }
+
+  DBService.loadPhoto($stateParams.id).then(
+      function(result){
+          //console.log("Dados carregados do banco de dados: " + JSON.stringify(result));
+          $ionicLoading.hide();
+          $scope.photo = result;
+          $scope.photo.url = 'data:image/png;base64,' + result.base64;
+          var date = Date.parse(result.data);
+          $scope.photo.stars = [];
+          $scope.photo.starsEmpty = [];
+          for(var j=1; j<= 5; j++){
+            if(j <= result.rating) $scope.photo.stars.push(1);
+            else $scope.photo.starsEmpty.push(1);
+          }
+          $scope.photo.day = date.toString("dd/MM/yy");
+          $scope.photo.hour = date.toString("hh:mm");
+          $scope.$digest();
+        }
+  )
+
+  ImagensServices.recuperaComentarios($stateParams.id).then(
+    function(comentarios){
+      console.log("me = " + user.username);
+      $scope.me = user.username;
+      $scope.comentarios = comentarios;
+      $scope.digest();
+    }
+  )
+  
 })
 
 .controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
@@ -219,7 +294,7 @@ angular.module('starter.controllers', [])
   });*/  
 })
 
-.controller("PictureCtrl", function($scope, $cordovaCamera, $cordovaSQLite, DBService, ImagensServices) {
+.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, DBService, ImagensServices) {
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
         $scope.blankTitle = true;
@@ -231,6 +306,11 @@ angular.module('starter.controllers', [])
         getBase64FromImageUrl(imgURI); 
       }
       
+    }
+
+    $scope.reloadHome = function(){
+      $scope.$emit('todo:listChanged');
+      $state.go('app.photolists');
     }
 
     $scope.takePicture = function() {
@@ -272,6 +352,7 @@ angular.module('starter.controllers', [])
               function onSuccess(){
                   $scope.dbResult = "Imagem salva e sincronizada com sucesso!";
                   $scope.$digest();
+                  
               },
               function onError(){
                   $scope.dbResult = "Falha, tente novamente";

@@ -1,12 +1,11 @@
 <ion-view view-title="Home">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="photo in feed" href="#/app/photolists/{{photo.id}}" class="padding-five">
-        
-        
+      <ion-item ng-repeat="photo in feed" href="#/app/photolists/{{photo.idImagem}}" class="no-padding item item-thumbnail-left">
+        <!-- ui-sref='app.details({photoId: photo.id})' -->
+        <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
         <label ng-show="photo.emptyWeek"><center>Semana sem Coletas: {{photo.date}}</center></label>
         <div class="row row-center" ng-show="photo.nome !== undefined">
-          <div class="col col-33"><img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list"></div>
           <div class="col col-67">
             <div class = "row row-center">
               <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
@@ -18,23 +17,36 @@
             <div class = "row row-center">
               <label>{{photo.data}}</label>
             </div>
+            <div class = "row row-center" ng-show="photo.ultimoComentario">
+              <label>Ultimo Comentário: {{photo.ultimoComentario}}</label>
+            </div>
           </div>
           
         </div>
-
+        </a>
       </ion-item>
     </ion-list>
     <button class="button button-full button-energized" ng-click="loadList()">
     Carregar Mais Refeições
     </button>
   </ion-content>
+  <ion-footer-bar>
+  <div class="tabs tabs-icon-top" ng-click="camera()">
+    <a class="tab-item" >
+      <i class="icon ion-camera"></i>
+      Camera
+    </a>
+  </div>
+  </ion-footer-bar>
+   <!--
   <ion-footer-bar align-title="center" class="bar-energized">
-  <div class="buttons">
+ <div class="buttons">
     <button class="button icon-left ion-home">Home</button>
   </div>
   <h1 class="title">Nu3 App</h1>
-  <div class="buttons">
-    <button class="button icon-left ion-camera" ng-click="camera()">Camera</button>
-  </div>
+  
+    <button class="button button-full icon-left ion-camera" ng-click="camera()">&nbsp;&nbsp;&nbsp;Camera</button>
+
   </ion-footer-bar>
+  -->
 </ion-view>
