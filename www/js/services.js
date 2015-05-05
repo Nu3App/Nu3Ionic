@@ -102,6 +102,8 @@ angular.module('nu3.services', [])
     login: function(user) {
       var deferred = Q.defer();
       var url = urlService + "auth/loginUsuario";
+      console.log("Arrumando email: " + user.email + " para : " + user.email.trim().toLowerCase());
+      user.email = user.email.trim().toLowerCase();
       $http.post(url, user,{transformRequest: transformRequestAsFormPost})
       .success(function (data) {
       	//data.nomeUsuario, mail, data.token, data.dataExpiracao
@@ -139,7 +141,7 @@ angular.module('nu3.services', [])
       
       try{    
         self.db = $cordovaSQLite.openDB("my.db"); 
-        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS users (ID TEXT PRIMARY KEY, username TEXT, email TEXT, token TEXT, token_date DATETIME)");
+        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS users (ID TEXT PRIMARY KEY, nomeUsuario TEXT, email TEXT, token TEXT, token_date DATETIME)");
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, data TEXT, rating INTEGER, synchronized INTEGER)");
         def.resolve(true);
       }catch(e){
@@ -158,7 +160,7 @@ angular.module('nu3.services', [])
   self.insertUser = function(userEntry) {
     var deferred = Q.defer();
     //pensar em um jeito de deixar uma tabela single row, talvez com um index fixo...
-    var query = "INSERT OR REPLACE INTO users (ID, username, email, token, token_date) VALUES (?,?,?,?,?)"; //ID TEXT PRIMARY KEY, username TEXT, email TEXT, token TEXT, token_date DATETIME
+    var query = "INSERT OR REPLACE INTO users (ID, nomeUsuario, email, token, token_date) VALUES (?,?,?,?,?)"; //ID TEXT PRIMARY KEY, username TEXT, email TEXT, token TEXT, token_date DATETIME
     $cordovaSQLite.execute(self.db, query, [userEntry.idUsuario, userEntry.nomeUsuario, userEntry.email, userEntry.token, userEntry.dataExpiracao]).then(function(res) {
         console.log("INSERT ID -> " + res.insertId);
         deferred.resolve(res);
@@ -216,7 +218,7 @@ angular.module('nu3.services', [])
     var deferred = Q.defer();
     var query = "INSERT INTO photos(ID, title, base64, data, rating, synchronized) VALUES (?,?,?,?,?,?)";
     $cordovaSQLite.execute(self.db, query, [json.idImagem, json.nome, base64, json.data, json.rating, mode]).then(function(res) {
-        console.log("Photo " + json.idImagem + " adicionado no banco de dados com sucesso!");
+        //console.log("Photo " + json.idImagem + " adicionado no banco de dados com sucesso!");
         deferred.resolve(true);
     }, function (err) {
         console.error("Photo " + json.idImagem + " ERRO ao adicionar no banco de dados!!!");
@@ -263,7 +265,7 @@ angular.module('nu3.services', [])
     var deferred = Q.defer();
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost, headers: {'Accept': "text"}})
       .success(function (data) {
-        console.log(string + JSON.stringify(data));
+        //console.log(string + JSON.stringify(data));
         deferred.resolve(data);
       })
       .error(function (data, status) {
@@ -358,12 +360,12 @@ angular.module('nu3.services', [])
               ImagensServices.recuperaImagem(json.idImagem, user.token).then(
                 function (base){
                   if (base != null){
-                    console.log("Teste base: " + base.slice(0,10) + ".....");
+                    //console.log("Teste base: " + base.slice(0,10) + ".....");
                     json["base64"] = base;
                     
                     DBService.addPhoto(json, base, 1).then(
                       function(){
-                        console.log("Base adicionada no banco de dados...");
+                        console.log("Base da imagem" + json.idImagem + "adicionada no banco de dados...");
                       }
                     );
                     deferred.resolve(json);

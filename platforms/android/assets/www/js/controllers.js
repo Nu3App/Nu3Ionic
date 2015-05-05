@@ -45,7 +45,7 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('PhotolistsCtrl', function($scope,$rootScope,$state, DBService, FeedService, ImagensServices) {
+.controller('PhotolistsCtrl', function($scope,$rootScope,$state, $ionicLoading, DBService, FeedService, ImagensServices) {
   var today = Date.today().add(1).days();
   var lastSunday = Date.parse("last sunday");
   var beginningDate = Date.parse("last sunday");
@@ -54,38 +54,64 @@ angular.module('starter.controllers', [])
 
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
+    beginningDate = Date.parse("last sunday");
+    endingDate = Date.today().add(1).days();
     ConstructFeed();
   });
 
   DBService.getUser().then(function(){
     ConstructFeed();
   });
-   function ConstructFeed(){
+
+ function ConstructFeed(){
+    $ionicLoading.show({
+      content: 'Loading Data',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 300
+    });
     ImagensServices.recuperaImagemData(lastSunday, today).then(
         function onFulfilled(ajaxData){
           console.log("AJAX promise fulfulled!");
           prepareFeed(ajaxData).then(function(){
+            $ionicLoading.hide();
             console.log("Feed construido!");
           });
 
         },
         function onRejected(reason){
           console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
+          $ionicLoading.hide();
+          $state.go('login');
         }
     );
   }
 
-  function ConstructExtraWeekFeed(){
+  $scope.loadMore = function (){
+    console.log('Load More Call');
+      $ionicLoading.show({
+        content: 'Loading Data',
+        animation: 'fade-in',
+        showBackdrop: false,
+        maxWidth: 200,
+        showDelay: 300
+    });
     endingDate = beginningDate.clone();
     beginningDate = beginningDate.addWeeks(-1);
       ImagensServices.recuperaImagemData(beginningDate, endingDate).then(
         function onFulfilled(ajaxData){
           console.log("AJAX promise fulfulled!");
-          prepareFeed(ajaxData);
+          prepareFeed(ajaxData).then(function(){
+             $ionicLoading.hide();
+             $scope.$broadcast('scroll.infiniteScrollComplete');
+             console.log("Feed Extra Week construido!");
+          });
 
         },
         function onRejected(reason){
           console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
+          $state.go('login');
         }
     );
   }
@@ -112,6 +138,7 @@ angular.module('starter.controllers', [])
             console.log("Achou a foto? Finally!!!  " + json["idImagem"]);
             //console.log("Imagem: " + JSON.stringify(json));
             json['url'] = 'data:image/png;base64,' + json.base64;
+            json['detail_url'] = "#/app/photolists/" + json["idImagem"];
             $scope.feed.push(json);
             $scope.$digest();
           },
@@ -134,7 +161,8 @@ angular.module('starter.controllers', [])
       console.log("Scopo: " + $scope.feed);
       var week = {
         "emptyWeek": true,
-        "date": ("0" + beginningDate.getDate()).slice(-2) + "/" + ("0" + (beginningDate.getMonth() + 1)).slice(-2)  
+        "date": ("0" + beginningDate.getDate()).slice(-2) + "/" + ("0" + (beginningDate.getMonth() + 1)).slice(-2) ,
+        "detail_url": "#" 
       }
       $scope.feed.push(week);
       console.log("Scope : " + JSON.stringify($scope.feed));
@@ -144,41 +172,10 @@ angular.module('starter.controllers', [])
     return deferred.promise;
 
   }
-  $scope.loadList = function() {
-      //var imgURI = $scope.imgURI;
-      //console.log("Img URI: " + imgURI);
-      //var base64 = getBase64FromImageUrl(imgURI);
-      //var id = Date.now();
-      ConstructExtraWeekFeed();
-
-      /*$scope.photolists = [];
-      var query = "SELECT * FROM photos";
-      $cordovaSQLite.execute(db, query).then(function(res) {
-          if(res.rows.length > 0) {
-              for(var i=0; i<res.rows.length; i++){
-                //console.log("SELECTED -> " + res.rows.item(i).ID + " " + res.rows.item(i).base64);
-                //console.log("Imagem: " + JSON.stringify(res.rows.item(i)));
-                var date = Date.parse(res.rows.item(i).data);
-                var image = {
-                  id: res.rows.item(i).ID,
-                  title: res.rows.item(i).title,
-                  date: date.toString("d/M - HH:mm"),
-                  url:  "data:image/jpeg;base64," + res.rows.item(i).base64
-                }
-                $scope.photolists.push(image);
-              }
-              
-          } else {
-              console.log("No results found");
-          }
-      }, function (err) {
-          console.error(err);
-      });*/
-    }
-
-    $scope.camera = function(){
-      $state.go('app.camera');
-    }
+  
+  $scope.camera = function(){
+    $state.go('app.camera');
+  }
 
 })
 
@@ -246,8 +243,8 @@ angular.module('starter.controllers', [])
 
   ImagensServices.recuperaComentarios($stateParams.id).then(
     function(comentarios){
-      console.log("me = " + user.username);
-      $scope.me = user.username;
+      console.log("me = " + user.nomeUsuario);
+      $scope.me = user.nomeUsuario;
       $scope.comentarios = comentarios;
       $scope.digest();
     }
@@ -273,11 +270,13 @@ angular.module('starter.controllers', [])
          
          DBService.insertUser(result).then(function(){
             console.log("Dados do usuário inseridos no banco de dados...");
+            $scope.$emit('todo:listChanged');
             $state.go('app.photolists');
          });
         },
         function onRejected(reason, status){
           //do error handling
+
           var error = "Login failed.";
           //if (status == 401) {
           //  error = "Invalid Username or Password.";

@@ -1,7 +1,7 @@
 <ion-view view-title="Home">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="photo in feed" href="#/app/photolists/{{photo.idImagem}}" class="no-padding item item-thumbnail-left">
+      <ion-item ng-repeat="photo in feed" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
         <!-- ui-sref='app.details({photoId: photo.id})' -->
         <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
         <label ng-show="photo.emptyWeek"><center>Semana sem Coletas: {{photo.date}}</center></label>
@@ -23,12 +23,13 @@
           </div>
           
         </div>
-        </a>
       </ion-item>
     </ion-list>
-    <button class="button button-full button-energized" ng-click="loadList()">
+    <ion-infinite-scroll immediate-check="false" on-infinite="loadMore()" distance="1%">
+    </ion-infinite-scroll>
+    <!--<button class="button button-full button-energized" ng-click="loadList()">
     Carregar Mais Refeições
-    </button>
+    </button>-->
   </ion-content>
   <ion-footer-bar>
   <div class="tabs tabs-icon-top" ng-click="camera()">

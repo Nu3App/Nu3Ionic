@@ -27,7 +27,7 @@
         <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
         <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
         <button class="button" ng-hide="dbResult !== undefined" ng-click="takePicture()">Take Picture</button>
-        <button ng-show="imgURI !== undefined"  ng-hide="dbResult !== undefined" class="button" ng-click="savePicture()">Salvar</button>
+        <button ng-hide="imgURI === undefined || dbResult !== undefined" class="button" ng-click="savePicture()">Salvar</button>
 
         
     </ion-content>
