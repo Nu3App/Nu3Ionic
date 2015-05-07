@@ -190,6 +190,28 @@ angular.module('nu3.services', [])
     return deferred.promise;
   }
 
+  self.loadOfflinePhotos = function(){
+    var deferred = Q.defer();
+    var query = "SELECT * FROM photos WHERE synchronized=0";
+    $cordovaSQLite.execute(self.db, query).then(function(res) {
+        var len = res.rows.length;
+          //console.log("DB: found photo " + id + "   row lenght: " + len);
+          if(len>0){
+            console.log("DB: Photos offline loaded.");
+            //console.log("ROW: " + JSON.stringify(row));
+            //deferred.resolve(result.rows.item(0)['base64']);
+            deferred.resolve(res.rows);
+          }
+          else{
+            deferred.resolve(null);
+          }
+    }, function (err) {
+        console.error("Photos Offline: ERRO ao carragar do banco de dados!!!");
+        console.error(JSON.stringify(err));
+    });    
+    return deferred.promise;
+  },
+
   self.loadPhoto = function(idImagem){
     var deferred = Q.defer();
     var query = "SELECT * FROM photos WHERE ID=?";
@@ -209,6 +231,22 @@ angular.module('nu3.services', [])
     }, function (err) {
         console.error("Photo " + json.idImagem + " ERRO ao carragar do banco de dados!!!");
         console.error(JSON.stringify(err));
+    });    
+    return deferred.promise;
+  },
+
+  self.updatePhoto = function(idImagem, novaID){
+    var deferred = Q.defer();
+    console.log("DB -> Updating photo infos from " + idImagem + " to " + novaID);
+    var query = "UPDATE photos SET ID= ?, synchronized = 1 WHERE ID = ?";
+    $cordovaSQLite.execute(self.db, query, [novaID, idImagem]).then(function(res) {
+        console.log("DB Photo Update com sucesso");
+        deferred.resolve(true);
+         
+    }, function (err) {
+        console.log("Update Image Error!!!");
+        console.log(JSON.stringify(err));
+        deferred.reject(err);
     });    
     return deferred.promise;
   },
@@ -253,6 +291,10 @@ angular.module('nu3.services', [])
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost})
       .success(function (data) {
         console.log(string + JSON.stringify(data));
+        if(url == urlService + "image/obtemResumoImagens"){
+          console.log("Recuperando image/obtemResumoImagens " + dataE.millisDataInicio);
+          data.stamp = dataE.millisDataInicio;
+        }
         deferred.resolve(data);
       })
       .error(function (data, status) {
@@ -265,7 +307,7 @@ angular.module('nu3.services', [])
     var deferred = Q.defer();
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost, headers: {'Accept': "text"}})
       .success(function (data) {
-        //console.log(string + JSON.stringify(data));
+        console.log(string + JSON.stringify(data).substr(0,30));
         deferred.resolve(data);
       })
       .error(function (data, status) {
@@ -277,7 +319,7 @@ angular.module('nu3.services', [])
 
   return {
     recuperaImagemData: function(dataInicio, dataFim){
-      console.log("Recupera Imagem Data de " + dataInicio + " até " + dataFim);
+      console.log("Recupera Imagem Data de " + dataInicio + " até " + dataFim );
       var dataE = {"token" : user.token, "millisDataInicio" : dataInicio.getTime(), "millisDataFim" : dataFim.getTime()};
       var url = urlService + "image/obtemResumoImagens";
       return AJAXservice(url, dataE, "Recupera Imagem Data: ");
@@ -300,9 +342,9 @@ angular.module('nu3.services', [])
       var url = urlService + "comment/criaComentario";
       return AJAXservice(url, dataE, "Cria Comentario: ");
     },
-    criaImagem: function(title, base64){
+    criaImagem: function(title, base64, timestamp){
       var url = urlService + "image/criaImagem";
-      var dataE = {"token" : user.token, "nomeFoto" : title , "descricao" : new Date().getTime() , "base64code" : base64};
+      var dataE = {"token" : user.token, "nomeFoto" : title , "descricao" : timestamp , "base64code" : base64};
       return AJAXtextService(url, dataE, "Cria Foto: ");
     }
   }

@@ -6,10 +6,19 @@
 // 'starter.controllers' is found in controllers.js
 
 var user = null;
+var networkType = null;
 var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'nu3.services'])
 
-.run(function($ionicPlatform, $state, DBService) {
+.run(function($ionicPlatform, $state, DBService, $cordovaNetwork, $rootScope) {
   $ionicPlatform.ready(function() {
+    networkType = $cordovaNetwork.getNetwork()
+
+    var isOnline = $cordovaNetwork.isOnline()
+
+    var isOffline = $cordovaNetwork.isOffline()
+
+
+    
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
