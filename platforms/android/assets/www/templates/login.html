@@ -7,20 +7,25 @@
   </ion-header-bar>
   <ion-content>
     <form ng-submit="login()">
-      <div>{{message}}</div>
+      <div class="card" ng-show="message">
+        <div class="item item-text-wrap">
+          {{message}}
+        </div>
+      </div>
       <div class="list">
         <label class="item item-input">
-          <span class="input-label">Username</span>
+          <span class="input-label">Email</span>
           <input type="text" ng-model="user.email">
         </label>
         <label class="item item-input">
-          <span class="input-label">Password</span>
+          <span class="input-label">Senha</span>
           <input type="password" ng-model="user.senha">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
+          <button class="button button-block button-positive" type="submit">Logar</button>
         </label>
       </div>
     </form>
+    <a href="#/register" class="button button-block button-positive">Cadastra-se</a>
   </ion-content>
 </ion-modal-view>

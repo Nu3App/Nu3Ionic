@@ -98,24 +98,28 @@ angular.module('nu3.services', [])
 )
 .factory('AuthenticationService', function($rootScope, $http, transformRequestAsFormPost) {
   $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-  return {
-    login: function(user) {
-      var deferred = Q.defer();
-      var url = urlService + "auth/loginUsuario";
-      console.log("Arrumando email: " + user.email + " para : " + user.email.trim().toLowerCase());
-      user.email = user.email.trim().toLowerCase();
-      $http.post(url, user,{transformRequest: transformRequestAsFormPost})
+  function AJAXservice(url, dataE, string){
+    var deferred = Q.defer();
+    $http.post(url, dataE,{transformRequest: transformRequestAsFormPost})
       .success(function (data) {
-      	//data.nomeUsuario, mail, data.token, data.dataExpiracao
-    	//$http.defaults.headers.common.Authorization = data.token;  // Step 1
-        console.log("Usuário Logado DATA: " + JSON.stringify(data));
+        console.log(string + JSON.stringify(data));
+        if(url == urlService + "image/obtemResumoImagens"){
+          console.log("Recuperando image/obtemResumoImagens " + dataE.millisDataInicio);
+          data.stamp = dataE.millisDataInicio;
+        }
         deferred.resolve(data);
       })
       .error(function (data, status) {
         console.log("Erro: " + JSON.stringify(data) + " Status: " + status);
         deferred.reject(data, status);
       });
-      return deferred.promise;
+    return deferred.promise
+  }
+  return {
+    login: function(user) {
+      user.email = user.email.trim().toLowerCase();
+      var url = urlService + "auth/loginUsuario";
+      return AJAXservice(url, user, "Login Data: ");
     },
     logout: function(user) {
       $http.post('https://logout', {}, { ignoreAuthModule: true })
@@ -124,6 +128,12 @@ angular.module('nu3.services', [])
         delete $http.defaults.headers.common.Authorization;
         $rootScope.$broadcast('event:auth-logout-complete');
       });			
+    },
+    register: function(user){
+      user.email = user.email.trim().toLowerCase();
+      var dataE = {"email" : user.email, "senha" : user.senha, "nome" : user.nome};
+      var url = urlService + "auth/criaUsuario";
+      return AJAXservice(url, dataE, "Login Data: ");
     },	
     loginCancelled: function() {
       authService.loginCancelled();
@@ -220,7 +230,7 @@ angular.module('nu3.services', [])
           //console.log("DB: found photo " + id + "   row lenght: " + len);
           if(len>0){
             var row = res.rows.item(0);
-            console.log("DB: Photo with id " + idImagem + " loaded.");
+            //console.log("DB: Photo with id " + idImagem + " loaded.");
             //console.log("ROW: " + JSON.stringify(row));
             //deferred.resolve(result.rows.item(0)['base64']);
             deferred.resolve(row);
@@ -290,9 +300,9 @@ angular.module('nu3.services', [])
     var deferred = Q.defer();
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost})
       .success(function (data) {
-        console.log(string + JSON.stringify(data));
+        //console.log(string + JSON.stringify(data));
         if(url == urlService + "image/obtemResumoImagens"){
-          console.log("Recuperando image/obtemResumoImagens " + dataE.millisDataInicio);
+          //console.log("Recuperando image/obtemResumoImagens " + dataE.millisDataInicio);
           data.stamp = dataE.millisDataInicio;
         }
         deferred.resolve(data);
@@ -307,7 +317,7 @@ angular.module('nu3.services', [])
     var deferred = Q.defer();
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost, headers: {'Accept': "text"}})
       .success(function (data) {
-        console.log(string + JSON.stringify(data).substr(0,30));
+        //console.log(string + JSON.stringify(data).substr(0,30));
         deferred.resolve(data);
       })
       .error(function (data, status) {
@@ -319,7 +329,7 @@ angular.module('nu3.services', [])
 
   return {
     recuperaImagemData: function(dataInicio, dataFim){
-      console.log("Recupera Imagem Data de " + dataInicio + " até " + dataFim );
+      //console.log("Recupera Imagem Data de " + dataInicio + " até " + dataFim );
       var dataE = {"token" : user.token, "millisDataInicio" : dataInicio.getTime(), "millisDataFim" : dataFim.getTime()};
       var url = urlService + "image/obtemResumoImagens";
       return AJAXservice(url, dataE, "Recupera Imagem Data: ");
@@ -327,7 +337,7 @@ angular.module('nu3.services', [])
     },
     recuperaImagem: function(imagemID, token){
       var dataE = {"token" : user.token, "idImagem" : imagemID};
-      console.log("Recupera Imagem Data: " + JSON.stringify(dataE));
+      //console.log("Recupera Imagem Data: " + JSON.stringify(dataE));
       var url = urlService + "image/obtemImagem";
       //return AJAXservice(url, dataE, "Recupera Imagem: ");
       return AJAXtextService(url, dataE, "Obtem Imagem: ");
@@ -354,32 +364,17 @@ angular.module('nu3.services', [])
  
   return {
 
-    buildPhotoJson : function(json, previousWeekend){
-        var newDate = Date.parse(json.data);
-        console.log("Data: " + JSON.stringify(newDate));
+    buildPhotoJson : function(json){
         json["stars"] = [];
         json["starsEmpty"] = [];
         for(var j=1; j<= 5; j++){
           if(j <= json.rating) json["stars"].push(1);
           else json["starsEmpty"].push(1);
         }
-        //logica para dividir o feed semanalmente:
-        if(newDate != null){
-          var weekend = newDate.last().sunday();
-          weekend.setHours(0,0,0,0);
-          //console.log("Weekend da foto " + image["index"] + "-> " + weekend);
-          if (previousWeekend == null || weekend.compareTo(previousWeekend) == -1){
-            //console.log("First foto do weekend: " + image["firstPhotoOfTheWeek"] + " >>> " + image["title"]);
-            var dia = ("0" + weekend.getDate()).slice(-2);
-            var mes = ("0" + (weekend.getMonth() + 1)).slice(-2);
-            json["firstPhotoOfTheWeek"] = dia +"/"+ mes;
-            previousWeekend = weekend.clone();  
-          }
-        }
         if(json.hasOwnProperty('ultimoComentario')){
           json["ultimoComentario"] = json["ultimoComentario"].texto; //tira do dicionario somente a parte importante
         }
-        return [json, previousWeekend];
+        return json;
     },
 
    findPhotoBase : function(json){
@@ -393,11 +388,11 @@ angular.module('nu3.services', [])
                 console.log("Atualizando rating da foto");
                 ImagensServices.updateRating(json.idImagem, json.rating);
               }
-              console.log("Base64 já existente no banco de dados");
+              //console.log("Base64 já existente no banco de dados");
               deferred.resolve(json);
             }
             else{
-              console.log("Base64 não presente no banco de dados");
+              //console.log("Base64 não presente no banco de dados");
             //pede para o webservice a base64 e então adiciona no banco de dados
               ImagensServices.recuperaImagem(json.idImagem, user.token).then(
                 function (base){

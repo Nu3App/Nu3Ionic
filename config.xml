@@ -2,10 +2,10 @@
 <widget id="com.ionicframework.nu3ionic337568" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Nu3Ionic</name>
   <description>
-        An Ionic Framework and Cordova project.
+        Projeto de acompanhamento nutricional.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+  <author email="nu3app@gmail.com" href="http://nu3.unifesp.br/">
+      Nu3 Team
     </author>
   <content src="index.html"/>
   <access origin="*"/>

@@ -37,10 +37,10 @@
     <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     <name>Nu3Ionic</name>
     <description>
-        An Ionic Framework and Cordova project.
+        Projeto de acompanhamento nutricional.
     </description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+    <author email="nu3app@gmail.com" href="http://nu3.unifesp.br/">
+      Nu3 Team
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -51,7 +51,4 @@
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="3000" />
     <preference name="orientation" value="portrait" />
-    <feature name="StatusBar">
-        <param name="ios-package" onload="true" value="CDVStatusBar" />
-    </feature>
 </widget>

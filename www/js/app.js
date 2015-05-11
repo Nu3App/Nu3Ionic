@@ -62,6 +62,12 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       templateUrl: "templates/login.html"
   })
 
+  .state('register', {
+      url: "/register",
+      animation: 'slide-in-up',
+      templateUrl: "templates/register.html"
+  })
+
   .state('app.camera', {
     url: "/camera",
     views: {

@@ -66,20 +66,29 @@ angular.module('starter.controllers', [])
 
 .controller('PhotolistsCtrl', function($scope,$rootScope,$state, $ionicLoading, $cordovaNetwork, DBService, FeedService, ImagensServices) {
   var day = Date.today();
+  var promiseList = [];
   $scope.feed = [];
+  $scope.offlinePhotos = [];
   $scope.scroll = true;
   
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
+    promiseList = [];
+    day = Date.today();
     ConstructFeed();
   });
 
   $rootScope.$on('todo:listAdded', function() {
+    $scope.$digest();
     console.log('Event: todo:listAdded');
-    if($scope.feed.length < 7){
+    $scope.$broadcast('scroll.infiniteScrollComplete');
+    /*if($scope.feed.length < 7){
       console.log("feed muito pequeno, carregando mais dados...");
       $scope.loadMore();
-    }
+    }*/
+    //else{
+      $ionicLoading.hide();
+    //}
   });
 
   $rootScope.$on('network:changed', function() {
@@ -116,7 +125,19 @@ angular.module('starter.controllers', [])
     ConstructFeed();
   });
 
+  var sort_by = function(field, reverse, primer){
+   var key = primer ? 
+       function(x) {return primer(x[field])} : 
+       function(x) {return x[field]};
+
+   reverse = !reverse ? 1 : -1;
+   return function (a, b) {
+       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+     } 
+  }
+
  function ConstructFeed(){
+    console.log("ConstructFeed Call");
     $ionicLoading.show({
       content: 'Loading Data',
       animation: 'fade-in',
@@ -126,61 +147,73 @@ angular.module('starter.controllers', [])
     });
 
     $scope.feed = [];
+    $scope.offlinePhotos = [];
 
-    if($cordovaNetwork.isOnline()){
-      console.log("Preparando feed online!");
-      $scope.scroll = true;
-      ImagensServices.recuperaImagemData(Date.today(), Date.today().add(1).day()).then(
-          function onFulfilled(ajaxData){
-            console.log("AJAX promise fulfulled!");
-            prepareFeed(ajaxData).then(function(){
-              $ionicLoading.hide();
-              $scope.$digest();
-              console.log("Feed construido!");
-              $scope.$emit('todo:listAdded');
-            });
-
-          },
-          function onRejected(reason){
-            console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
-            $ionicLoading.hide();
-            $state.go('login');
+    offlineFeed().then(function(offlineContent){
+      console.log("Offline Lib return: " + offlineContent);
+      if(offlineContent || !$cordovaNetwork.isOnline()){
+        //console.log("Offline feed: " + JSON.stringify($scope.offlinePhotos));
+        $scope.qtd = offlineContent.qtd;
+        console.log("offline content = " + JSON.stringify(offlineContent).substring(0,80));
+        $scope.offlinePhotos = offlineContent.photos;
+        $scope.$digest();
+        $scope.scroll = false;
+        $ionicLoading.hide();
+        
+        //existe photos para sincronizar...
+      }
+      else{
+        if($cordovaNetwork.isOnline()){
+          console.log("Preparando feed online!");
+          $scope.scroll = true;
+          var dayEntry = {
+            photos: [],
+            label: day.toString("dd/MM") 
           }
-      );
-    }
-    else{
-      console.log("Preparando feed offline!");
-      $scope.scroll = false;
-      offlineFeed().then(
-        function(){
-          $ionicLoading.hide();
-          $scope.$digest();
-        }
-      );
-    }
+          ImagensServices.recuperaImagemData(Date.today(), Date.today().add(1).day()).then(
+              function onFulfilled(ajaxData){
+                console.log("AJAX promise fulfulled!");
+                prepareFeed(ajaxData).then(function(photos){
+                  dayEntry.photos = photos;
+                  $scope.feed.push(dayEntry);
+                  
+                  console.log("Feed construido!");
+                  $scope.$emit('todo:listAdded');
+                });
+
+              },
+              function onRejected(reason){
+                console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
+                $ionicLoading.hide();
+                $state.go('login');
+              }
+          );
+        } 
+      }
+    })
 }
 
   $scope.sincronizar = function (){
     console.log("Sincronizar called!");
     if($cordovaNetwork.isOnline()){
-      var qtd = $scope.feed.length;
+      var qtd = $scope.offlinePhotos.length;
       console.log("QTD: " + qtd);
       for (var i= 0; i< qtd; i++){
-        sendAndUpdate($scope.feed[i], i);
+        sendAndUpdate($scope.offlinePhotos[i], i);
       }
     }
   }
 
   function sendAndUpdate(image, index){
     console.log("Image " + index + " -> " + image.title);
-    $scope.feed[index].synch = "Sincronizando...";
+    $scope.offlinePhotos[index].synch = "Sincronizando...";
     ImagensServices.criaImagem(image.title, image.base64, image.ID).then(
       function onFulfilled(result){
         console.log("criaImagem Fulfilled = " + image.title)
         DBService.updatePhoto(image.ID, result).then(
           function onFulffilled(r){
             console.log("updatePhoto Fulfilled = " + image.title);
-            $scope.feed[index].synch = "Sucesso";
+            $scope.offlinePhotos[index].synch = "Sucesso";
             $scope.qtd--;
             if($scope.qtd == 0){
               $scope.homebtn = true;
@@ -194,7 +227,7 @@ angular.module('starter.controllers', [])
       },
       function onError(){
         console.log("Cria Imagem error");
-        $scope.feed[index].synch = "Erro ao fazer upload!";
+        $scope.offlinePhotos[index].synch = "Erro ao fazer upload!";
         $scope.$digest();
       }
     );
@@ -202,25 +235,28 @@ angular.module('starter.controllers', [])
   
 
   $scope.loadMore = function (){
-    console.log('Load More Call');
-      $ionicLoading.show({
+    day = day.add(-1).day();
+    var end = day.clone().add(1).day();
+    var dayEntry = {
+      photos: [],
+      label: day.toString("dd/MM") 
+    }
+    $ionicLoading.show({
         content: 'Loading Data',
         animation: 'fade-in',
         showBackdrop: false,
         maxWidth: 200,
         showDelay: 300
     });
-    day = day.add(-1).day();
-    var end = day.clone().add(1).day();
-    console.log("DIA: " + day);
+    console.log("Load More Day: " + day.toString("dd/MM"));
       ImagensServices.recuperaImagemData(day, end).then(
         function onFulfilled(ajaxData){
           console.log("AJAX promise fulfulled!");
-          prepareFeed(ajaxData).then(function(){
-             $ionicLoading.hide();
-             $scope.$broadcast('scroll.infiniteScrollComplete');
+          prepareFeed(ajaxData).then(function(photos){
+             dayEntry.photos = photos;
+             $scope.feed.push(dayEntry);
+             console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
              $scope.$emit('todo:listAdded');
-             console.log("Feed Extra Day construido!");
           });
 
         },
@@ -229,15 +265,20 @@ angular.module('starter.controllers', [])
           $state.go('login');
         }
     );
+
   }
 
   function offlineFeed(){
     var deferred = Q.defer();
+    var offlineContent = {
+      'qtd': 0,
+      'photos': []
+    }
     var offlinePromise = DBService.loadOfflinePhotos().then(
       function onFulfilled(result){
-        console.log("OfflinePromise fulfilled! " + JSON.stringify(result));
+        //console.log("OfflinePromise fulfilled! " + JSON.stringify(result));
         if(result){
-          $scope.qtd = result.length;
+          offlineContent.qtd = result.length;
           for (var i = result.length - 1; i>=0; i--){
             //console.log(i + " -> " + JSON.stringify(result.item(i)));
             var image = result.item(i);
@@ -245,15 +286,15 @@ angular.module('starter.controllers', [])
             image['url'] = 'data:image/png;base64,' + image.base64;
             image['detail_url'] = "#";
             image['nome'] = image.title;
-            image['data'] = "Tirado em: " + parsedDate.toString("dd/MM - hh:mm"); 
-            $scope.feed.push(image);
-            $scope.$digest();
+            image['data'] = parsedDate.toString("dd/MM - hh:mm");
+            console.log("Offline Image = " + JSON.stringify(image).substring(0,50) + " title = " + image.nome);
+            offlineContent.photos.push(image);
           }
+          deferred.resolve(offlineContent);
         }
         else{
-          $scope.qtd = 0;
+          deferred.resolve(false);
         }
-        deferred.resolve(true);
       },
       function onRejected(reason){
         console.log("A promessa do offline foi rejeitada por algum motivo...");
@@ -265,33 +306,26 @@ angular.module('starter.controllers', [])
 
   function prepareFeed(imagensData){
     var deferred = Q.defer();
+    var photos = [];
     var dayAux = new Date(imagensData.stamp);
-    console.log("Preparando Feed..." + imagensData.stamp);
     if(imagensData && imagensData.length > 0){
-      console.log("Semana não vazia:");
-      var previousWeekend = null;
       var imagePromises = []; //Array de promeças para cada imagem carregada no loop
-
       for (var i = imagensData.length - 1; i>=0; i--){
-        console.log("Getting index " + i + " data...");
+        console.log("DEBUG: Getting index " + i + " data...");
         //idImagem , nome, data, rating, descricao, ultimoComentario (idComentario, nomeUsuario, texto, dataEnvio)
-        var returnedValues = FeedService.buildPhotoJson(imagensData[i], previousWeekend);
-        var json = returnedValues[0];
-        previousWeekend = returnedValues[1];
-        console.log("Pre-json builded!");
-
-        //precisa fazer uma promisse para carregar o base64 do SQLite
+        var json = FeedService.buildPhotoJson(imagensData[i]);
+        console.log("DEBUG: Pre-json builded!");
         json["index"] = i;
-        var basePromise = FeedService.findPhotoBase(json).then(
+        var basePromise = FeedService.findPhotoBase(json).then(//precisa fazer uma promisse para carregar o base64 do SQLite
           function onFulfilled(json){
-            console.log("Achou a foto? Finally!!!  " + json["idImagem"]);
+            //console.log("DEBUG: Achou a foto? Finally!!!  " + json["idImagem"]);
             //console.log("Imagem: " + JSON.stringify(json));
             var parsedDate = Date.parse(json.data);
             json['url'] = 'data:image/png;base64,' + json.base64;
             json['detail_url'] = "#/app/photolists/" + json["idImagem"];
-            json['data'] = "Tirado em: " + parsedDate.toString("dd/MM - hh:mm");
-            $scope.feed.push(json);
-            $scope.$digest();
+            json['timestamp'] = parsedDate.getTime();
+            json['data'] = parsedDate.toString("dd/MM - hh:mm");
+            photos.push(json);
           },
           function onRejected(reason){
             console.log("Algo deu errado...");
@@ -301,23 +335,16 @@ angular.module('starter.controllers', [])
         
       }//End -> for
       Q.all(imagePromises).then(function(){
-        console.log("Todas as promessas do feed foram cumpridas...");
-        //Todas promessas foram compridas, então resolva a promessa do conjunto todo:
-        deferred.resolve(true);
+        //console.log("DEBUG: Todas as promessas do feed foram cumpridas...");
+        //Todas promessas foram compridas, então orderne o conjunto das fotos, e resolva a promessa referente ao dia:
+        photos.sort(sort_by('timestamp', true, parseInt));
+        deferred.resolve(photos);
       });
 
     }
     else{ //semana vazia, ou seja, sem feed algum
-      console.error("Semana vazia..." + day);
-      var week = {
-        "emptyWeek": true,
-        "date": ("0" + dayAux.getDate()).slice(-2) + "/" + ("0" + (dayAux.getMonth() + 1)).slice(-2) ,
-        "detail_url": "#" 
-      }
-      $scope.feed.push(week);
-      //console.log("Scope : " + JSON.stringify($scope.feed));
-      $scope.$digest();
-      deferred.resolve(true);
+      //console.error("Semana vazia..." + day);
+      deferred.resolve(null);
     } 
     return deferred.promise;
 
@@ -427,14 +454,55 @@ angular.module('starter.controllers', [])
         function onRejected(reason, status){
           //do error handling
 
-          var error = "Login failed.";
+          var error = "Falha ao logar, tente novamente.";
           //if (status == 401) {
           //  error = "Invalid Username or Password.";
           //}
           $scope.message = error;
+          $scope.$digest();
         }
 
       );
+  };
+
+  /*$scope.$on('event:auth-loginRequired', function(e, rejection) {
+    console.log('handling login required');
+    $scope.loginModal.show();
+  });*/  
+})
+
+.controller('RegisterCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+  $scope.message = "";
+  
+  $scope.user = {
+    email: null,
+    nome: null,
+    senha: null,
+    senha2: null
+  };
+ 
+  $scope.register = function() {
+    if($scope.user.senha == $scope.user.senha2){
+      AuthenticationService.register($scope.user).then(
+        function onFulfilled(result){
+          console.log("Usuario criado: " + JSON.stringify(result));
+         $scope.user.senha = null;
+         $scope.user.senha2 = null;
+         $scope.message = "Usuário criado com sucesso, por favor faça o login."
+         $scope.btnFlag = true;
+         $scope.$digest();
+        },
+        function onRejected(reason, status){
+          //do error handling
+          var error = "Falha ao cadastrar, tente novamente.";
+          $scope.message = error;
+          $scope.$digest();
+        }
+      );
+    }
+    else{
+      $scope.message = "As senhas diferem, por favor verifique e tente novamente."
+    } 
   };
 
   /*$scope.$on('event:auth-loginRequired', function(e, rejection) {

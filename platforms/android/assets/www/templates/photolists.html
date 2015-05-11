@@ -1,46 +1,71 @@
 <ion-view view-title="Home">
   <ion-content>
-    <label class="pull-right">{{network}}</label>
-    <p> Você tem {{qtd}} fotos para sincronizar </p>
-    <div class="" ng-show="online && qtd > 0" ng-click="sincronizar()">
-      <a class="" >
-        <i class="icon ion-cloud"></i>
-        Sincronizar
-      </a>
-    </div>
-    <div class="" ng-show="homebtn" ng-click="goHomeOnline()">
-      <a class="" >
-        <i class="icon ion-home"></i>
-        Continuar
-      </a>
+    <!--<label class="pull-right">{{network}}</label>-->
+    <div class="card" ng-show="qtd || !online ">
+      <div class="item item-text-wrap">
+        Você tem {{qtd}} fotos para sincronizar
+      </div>
+      <div class="item item-divider" ng-show="online && qtd > 0">
+        <a ng-click="sincronizar()">
+          <i class="icon ion-cloud"></i>
+          Sincronizar
+        </a>
+      </div>
+      <div class="item item-divider" ng-show="homebtn">
+        <a ng-click="goHomeOnline()">
+          <i class="icon ion-home"></i>
+          Continuar
+        </a>
+      </div>
     </div>
     <ion-list>
-      <ion-item ng-repeat="photo in feed" href="{{photo.detail_url}}" class="no-padding " ng-class="{ 'item item-thumbnail-left': !photo.emptyWeek }">
-        <!-- ui-sref='app.details({photoId: photo.id})' -->
-        <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
-        <label ng-show="photo.emptyWeek"><center>Sem coletas no dia: {{photo.date}}</center></label>
-        <div class="row row-center" ng-show="photo.nome !== undefined">
-          <div class="col col-67">
-            <div class = "row row-center">
-              <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
-              <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
-            </div>
-            <div class = "row row-center">
-              <label ng-show="photo.nome !== undefined"><strong>{{photo.nome}}</strong></label>
-            </div>
-            <div class = "row row-center">
-              <label>{{photo.data}}</label>
-            </div>
-            <div class = "row row-center" ng-show="photo.ultimoComentario">
-              <label>Ultimo Comentário: {{photo.ultimoComentario}}</label>
-            </div>
-            <div class = "row row-center" ng-show="photo.synch !== undefined">
-              <label>Status: {{photo.synch}}</label>
-            </div>
+      <ion-item ng-rpeat="p in offlinePhotos" class="no-padding item">
+        
+        <img ng-src="{{p.url}}" class="img-list" ng-show="{{p.url}}">
+            teste {{p}}
+            <div class="row row-center">
+              <div class="col col-67">
+                <div class = "row row-center">
+                  <label><strong>{{p.nome}}</strong></label>
+                </div>
+                <div class = "row row-center">
+                  <label>{{p.data}}</label>
+                </div>
+                <div class = "row row-center" ng-show="photo.synch !== undefined">
+                  <label>Status: {{p.synch}}</label>
+                </div>
+              </div>
           </div>
-          
-        </div>
       </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-item ng-repeat="day in feed" class="no-padding item item-divider item-energized">
+        <label><center>Coletas do dia: <strong>{{day.label}}</strong></center></label>
+      
+      <ion-list>
+        <label ng-show="!day.photos" class="black"><center>Sem coletas nesse dia...</center></label>
+          <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
+            <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+            <div class="row row-center" ng-show="photo.nome !== undefined">
+              <div class="col col-67">
+                <div class = "row row-center">
+                  <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+                  <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+                </div>
+                <div class = "row row-center">
+                  <label ng-show="photo.nome !== undefined"><strong>{{photo.nome}}</strong></label>
+                </div>
+                <div class = "row row-center">
+                  <label>{{photo.data}}</label>
+                </div>
+                <div class = "row row-center" ng-show="photo.ultimoComentario">
+                  <label>Ultimo Comentário: {{photo.ultimoComentario}}</label>
+                </div>
+              </div>
+          </div>
+          </ion-item>
+        </ion-list>
+      </ion-item> 
     </ion-list>
     <ion-infinite-scroll immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>

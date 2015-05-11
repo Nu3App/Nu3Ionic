@@ -1,0 +1,40 @@
+<ion-modal-view ng-controller="RegisterCtrl">
+  <ion-header-bar>
+    <h1 class="title">Cadastro</h1>
+    <div class="buttons">
+      <!--<button class="button button-clear" ng-click="closeLogin()">Close</button>-->
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="register()">
+      <div class="card" ng-show="message">
+		  <div class="item item-text-wrap">
+		    {{message}}
+		  </div>
+	  </div>
+      
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Email</span>
+          <input type="text" ng-model="user.email">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Nome</span>
+          <input type="text" ng-model="user.name">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Senha</span>
+          <input type="password" ng-model="user.senha">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Confirmação da Senha</span>
+          <input type="password" ng-model="user.senha2">
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit" ng-hide="btnFlag">Cadastrar</button>
+        </label>
+      </div>
+    </form>
+    <a ng-show="btnFlag" href="#/login" class="button button-block button-positive">Login</a>
+  </ion-content>
+</ion-modal-view>
