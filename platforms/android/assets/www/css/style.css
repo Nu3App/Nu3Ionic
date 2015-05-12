@@ -39,6 +39,14 @@
     padding: 0px !important;
 }
 
+.feed-divider {
+	padding: 5px 1px 0px 1px !important;
+}
+
+.feed-card {
+	padding: 1px 1px 1px 1px !important;
+	margin: 0px 0px 0px 0px !important;
+}
 .black {
 	color: black;
 }

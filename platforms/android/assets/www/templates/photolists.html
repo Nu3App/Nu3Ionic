@@ -1,68 +1,63 @@
 <ion-view view-title="Home">
   <ion-content>
     <!--<label class="pull-right">{{network}}</label>-->
-    <div class="card" ng-show="qtd || !online ">
-      <div class="item item-text-wrap">
+    <div class="card" ng-show="offlineFeed">
+      <div class="item item-text-wrap" ng-show="qtd > 0">
         Você tem {{qtd}} fotos para sincronizar
       </div>
-      <div class="item item-divider" ng-show="online && qtd > 0">
-        <a ng-click="sincronizar()">
-          <i class="icon ion-cloud"></i>
-          Sincronizar
-        </a>
+      <div class="item item-text-wrap" ng-show="qtd == 0">
+        {{message}}
       </div>
-      <div class="item item-divider" ng-show="homebtn">
-        <a ng-click="goHomeOnline()">
+      <div class="item item-divider item-energized" ng-show="online && qtd > 0" ng-style="{'line-height': '50px'}">
+        <button class="button button-clear button-dark" ng-click="sincronizar()">
+          <i class="icon ion-cloud"></i>
+          &nbsp; &nbsp; Sincronizar
+        </button>
+      </div>
+      <div class="item item-divider item-energized" ng-show="homebtn">
+        <button class="button button-clear button-dark" ng-click="goHomeOnline()">
           <i class="icon ion-home"></i>
           Continuar
-        </a>
+        </button>
       </div>
     </div>
     <ion-list>
-      <ion-item ng-rpeat="p in offlinePhotos" class="no-padding item">
-        
+      <ion-item ng-repeat="p in offlinePhotos" class="item item-thumbnail-left">
         <img ng-src="{{p.url}}" class="img-list" ng-show="{{p.url}}">
-            teste {{p}}
-            <div class="row row-center">
-              <div class="col col-67">
-                <div class = "row row-center">
-                  <label><strong>{{p.nome}}</strong></label>
-                </div>
-                <div class = "row row-center">
-                  <label>{{p.data}}</label>
-                </div>
-                <div class = "row row-center" ng-show="photo.synch !== undefined">
-                  <label>Status: {{p.synch}}</label>
-                </div>
-              </div>
-          </div>
+        <h2><strong>{{p.nome}}</strong></h2>
+        <p>Tirado em: {{p.data}}</p>
+        <label>Status: {{p.synch}}</label>
       </ion-item>
     </ion-list>
     <ion-list>
-      <ion-item ng-repeat="day in feed" class="no-padding item item-divider item-energized">
-        <label><center>Coletas do dia: <strong>{{day.label}}</strong></center></label>
+      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider">
+        <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
       
       <ion-list>
-        <label ng-show="!day.photos" class="black"><center>Sem coletas nesse dia...</center></label>
+          <div class="card feed-card" ng-show="!day.photos">
+            <div class="item item-text-wrap">
+              <center>Sem coletas nesse dia...</center>
+            </div>
+          </div>
           <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
             <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
-            <div class="row row-center" ng-show="photo.nome !== undefined">
-              <div class="col col-67">
+            <div class = "row">
+              <div class = "col-90">
+                <div class = "row"><h2><strong>{{photo.nome}}</strong></h2></div>
                 <div class = "row row-center">
                   <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
                   <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
                 </div>
-                <div class = "row row-center">
-                  <label ng-show="photo.nome !== undefined"><strong>{{photo.nome}}</strong></label>
-                </div>
-                <div class = "row row-center">
-                  <label>{{photo.data}}</label>
-                </div>
-                <div class = "row row-center" ng-show="photo.ultimoComentario">
-                  <label>Ultimo Comentário: {{photo.ultimoComentario}}</label>
-                </div>
               </div>
-          </div>
+              <div class = "col-10" align = "center">
+                <div class = "row"><center><i class="icon ion-ios-clock-outline"></i></center></div>
+                <div class = "row row-center"><center>{{photo.hour}}</center></div>
+              </div>
+            </div>
+            <div ng-show="photo.ultimoComentario">
+              <label>Ultimo Comentário:</label>
+              <p>{{photo.ultimoComentario}}</p>
+            </div>
           </ion-item>
         </ion-list>
       </ion-item> 

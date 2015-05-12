@@ -111,7 +111,7 @@ angular.module('starter.controllers', [])
 
   $scope.goHomeOnline = function(){
     $scope.homebtn = false;
-    $scope.online = false;
+    $scope.qtd = false;
     ConstructFeed();
   }
 
@@ -150,12 +150,17 @@ angular.module('starter.controllers', [])
     $scope.offlinePhotos = [];
 
     offlineFeed().then(function(offlineContent){
+      var netStatus = $cordovaNetwork.isOnline();
       console.log("Offline Lib return: " + offlineContent);
-      if(offlineContent || !$cordovaNetwork.isOnline()){
+      if(offlineContent || !netStatus){
+        $scope.offlineFeed = true;
+        $scope.message = "Você não está conectado. Suas fotos serão salvas localmente e sincronizadas com nosso server quando você estiver conectado."
+        netStatus ? $scope.online = true : $scope.online = false;
         //console.log("Offline feed: " + JSON.stringify($scope.offlinePhotos));
         $scope.qtd = offlineContent.qtd;
-        console.log("offline content = " + JSON.stringify(offlineContent).substring(0,80));
+        
         $scope.offlinePhotos = offlineContent.photos;
+        console.log("offline content = " + JSON.stringify($scope.offlinePhotos).substring(0,80));
         $scope.$digest();
         $scope.scroll = false;
         $ionicLoading.hide();
@@ -163,7 +168,8 @@ angular.module('starter.controllers', [])
         //existe photos para sincronizar...
       }
       else{
-        if($cordovaNetwork.isOnline()){
+        if(netStatus){
+          $scope.offlineFeed = false;
           console.log("Preparando feed online!");
           $scope.scroll = true;
           var dayEntry = {
@@ -192,47 +198,6 @@ angular.module('starter.controllers', [])
       }
     })
 }
-
-  $scope.sincronizar = function (){
-    console.log("Sincronizar called!");
-    if($cordovaNetwork.isOnline()){
-      var qtd = $scope.offlinePhotos.length;
-      console.log("QTD: " + qtd);
-      for (var i= 0; i< qtd; i++){
-        sendAndUpdate($scope.offlinePhotos[i], i);
-      }
-    }
-  }
-
-  function sendAndUpdate(image, index){
-    console.log("Image " + index + " -> " + image.title);
-    $scope.offlinePhotos[index].synch = "Sincronizando...";
-    ImagensServices.criaImagem(image.title, image.base64, image.ID).then(
-      function onFulfilled(result){
-        console.log("criaImagem Fulfilled = " + image.title)
-        DBService.updatePhoto(image.ID, result).then(
-          function onFulffilled(r){
-            console.log("updatePhoto Fulfilled = " + image.title);
-            $scope.offlinePhotos[index].synch = "Sucesso";
-            $scope.qtd--;
-            if($scope.qtd == 0){
-              $scope.homebtn = true;
-              $scope.$digest();
-            }
-          },
-          function onError(reason){
-            console.log("Erro: " + JSON.stringify(reason));
-          }
-        )
-      },
-      function onError(){
-        console.log("Cria Imagem error");
-        $scope.offlinePhotos[index].synch = "Erro ao fazer upload!";
-        $scope.$digest();
-      }
-    );
-  }
-  
 
   $scope.loadMore = function (){
     day = day.add(-1).day();
@@ -325,6 +290,8 @@ angular.module('starter.controllers', [])
             json['detail_url'] = "#/app/photolists/" + json["idImagem"];
             json['timestamp'] = parsedDate.getTime();
             json['data'] = parsedDate.toString("dd/MM - hh:mm");
+            json['day'] = parsedDate.toString("dd/MM");
+            json['hour'] = parsedDate.toString("hh:mm");
             photos.push(json);
           },
           function onRejected(reason){
@@ -349,7 +316,48 @@ angular.module('starter.controllers', [])
     return deferred.promise;
 
   }
-  
+
+  function sendAndUpdate(image, index){
+    console.log("Image " + index + " -> " + image.title);
+    $scope.offlinePhotos[index].synch = "Sincronizando...";
+    ImagensServices.criaImagem(image.title, image.base64, image.ID).then(
+      function onFulfilled(result){
+        console.log("criaImagem Fulfilled = " + image.title)
+        DBService.updatePhoto(image.ID, result).then(
+          function onFulffilled(r){
+            console.log("updatePhoto Fulfilled = " + image.title);
+            $scope.offlinePhotos[index].synch = "Sucesso";
+            $scope.qtd--;
+            if($scope.qtd == 0){
+              $scope.message = "Suas fotos foram sincronizadas com sucesso!"
+              $scope.homebtn = true;
+              $scope.$digest();
+            }
+          },
+          function onError(reason){
+            console.log("Erro: " + JSON.stringify(reason));
+          }
+        )
+      },
+      function onError(){
+        console.log("Cria Imagem error");
+        $scope.offlinePhotos[index].synch = "Erro ao fazer upload!";
+        $scope.$digest();
+      }
+    );
+  }
+
+  $scope.sincronizar = function (){
+    console.log("Sincronizar called!");
+    if($cordovaNetwork.isOnline()){
+      var qtd = $scope.offlinePhotos.length;
+      console.log("QTD: " + qtd);
+      for (var i= 0; i< qtd; i++){
+        sendAndUpdate($scope.offlinePhotos[i], i);
+      }
+    }
+  }
+
   $scope.camera = function(){
     $state.go('app.camera');
   }
