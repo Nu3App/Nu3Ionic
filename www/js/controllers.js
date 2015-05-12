@@ -151,16 +151,20 @@ angular.module('starter.controllers', [])
 
     offlineFeed().then(function(offlineContent){
       var netStatus = $cordovaNetwork.isOnline();
-      console.log("Offline Lib return: " + offlineContent);
+      console.log("Offline Lib return: " + offlineContent + " netstatus: " + netStatus + !netStatus);
       if(offlineContent || !netStatus){
+        console.log("SCOPO = OFFLINE!");
         $scope.offlineFeed = true;
         $scope.message = "Você não está conectado. Suas fotos serão salvas localmente e sincronizadas com nosso server quando você estiver conectado."
         netStatus ? $scope.online = true : $scope.online = false;
+
         //console.log("Offline feed: " + JSON.stringify($scope.offlinePhotos));
-        $scope.qtd = offlineContent.qtd;
-        
-        $scope.offlinePhotos = offlineContent.photos;
-        console.log("offline content = " + JSON.stringify($scope.offlinePhotos).substring(0,80));
+        if(offlineContent){
+          $scope.qtd = offlineContent.qtd;
+          $scope.offlinePhotos = offlineContent.photos;
+          console.log("offline content = " + JSON.stringify($scope.offlinePhotos).substring(0,80));
+        }
+        else $scope.qtd = 0;
         $scope.$digest();
         $scope.scroll = false;
         $ionicLoading.hide();
