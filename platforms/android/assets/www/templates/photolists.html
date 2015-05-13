@@ -8,7 +8,7 @@
       <div class="item item-text-wrap" ng-show="qtd == 0">
         {{message}}
       </div>
-      <div class="item item-divider item-energized" ng-show="online && qtd > 0" ng-style="{'line-height': '50px'}">
+      <div class="item item-divider item-energized" ng-show="online && qtd > 0 && !loginBtn" ng-style="{'line-height': '50px'}">
         <button class="button button-clear button-dark" ng-click="sincronizar()">
           <i class="icon ion-cloud"></i>
           &nbsp; &nbsp; Sincronizar
@@ -18,6 +18,12 @@
         <button class="button button-clear button-dark" ng-click="goHomeOnline()">
           <i class="icon ion-home"></i>
           Continuar
+        </button>
+      </div>
+      <div class="item item-divider item-energized" ng-show="loginBtn">
+        <button class="button button-clear button-dark" ng-click="loginCall()">
+          <i class="icon ion-log-in"></i>
+          Entrar
         </button>
       </div>
     </div>
@@ -41,19 +47,23 @@
           </div>
           <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
             <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+            <div class = "row"><h2><strong>{{photo.nome}}</strong></h2></div>
             <div class = "row">
-              <div class = "col-90">
-                <div class = "row"><h2><strong>{{photo.nome}}</strong></h2></div>
-                <div class = "row row-center">
-                  <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
-                  <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
-                </div>
+              <div class="col-75">
+                <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+                <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
               </div>
-              <div class = "col-10" align = "center">
-                <div class = "row"><center><i class="icon ion-ios-clock-outline"></i></center></div>
-                <div class = "row row-center"><center>{{photo.hour}}</center></div>
+              <div class="col">
+                &nbsp;&nbsp;&nbsp;<i class="icon ion-ios-clock-outline"></i>{{photo.hour}}
               </div>
             </div>
+            
+              <!--
+
+                            <div class = "col-10 col-offset-90" align = "center">
+                <div class = "row"><center><i class="icon ion-ios-clock-outline"></i></center></div>
+                <div class = "row row-center"><center>{{photo.hour}}</center></div>
+              </div>-->
             <div ng-show="photo.ultimoComentario">
               <label>Ultimo Comentário:</label>
               <p>{{photo.ultimoComentario}}</p>

@@ -343,9 +343,16 @@ angular.module('starter.controllers', [])
           }
         )
       },
-      function onError(){
+      function onError(reason, status){
         console.log("Cria Imagem error");
-        $scope.offlinePhotos[index].synch = "Erro ao fazer upload!";
+        if(reason.msg == "Token invalido"){
+          $scope.offlinePhotos[index].synch = "Erro de autenticação!";
+          $scope.loginBtn = true;
+        }
+        else{
+          $scope.offlinePhotos[index].synch = "Erro de conexão. Tente novamente.";
+        }
+        
         $scope.$digest();
       }
     );
@@ -364,6 +371,11 @@ angular.module('starter.controllers', [])
 
   $scope.camera = function(){
     $state.go('app.camera');
+  }
+
+  $scope.loginCall = function(){
+    $scope.loginBtn = false;
+    $state.go('login');
   }
 
 })
