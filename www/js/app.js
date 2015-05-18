@@ -62,17 +62,20 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       templateUrl: "templates/login.html"
   })
 
-  .state('register', {
-      url: "/register",
-      animation: 'slide-in-up',
-      templateUrl: "templates/register.html"
-  })
-
   .state('app.camera', {
     url: "/camera",
     views: {
       'menuContent': {
         templateUrl: "templates/camera.html"
+      }
+    }
+  })
+
+  .state('app.search', {
+    url: "/search",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/search.html"
       }
     }
   })
@@ -113,4 +116,41 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/photolists');
-});
+})
+
+.directive('navClear', [
+  '$ionicViewService',
+  '$state',
+  '$location',
+  '$window',
+  '$rootScope',
+function($ionicHistory, $location, $state, $window, $rootScope) {
+  $rootScope.$on('$stateChangeError', function() {
+    $ionicHistory.nextViewOptions({
+      disableAnimate: false,
+      disableBack: true
+    });
+  });
+  return {
+    priority: 100,
+    restrict: 'AC',
+    compile: function($element) {
+      return { pre: prelink };
+      function prelink($scope, $element, $attrs) {
+        var unregisterListener;
+        function listenForStateChange() {
+          unregisterListener = $scope.$on('$stateChangeStart', function() {
+            $ionicHistory.nextViewOptions({
+              disableAnimate: true,
+              disableBack: true
+            });
+            unregisterListener();
+          });
+          $window.setTimeout(unregisterListener, 300);
+        }
+
+        $element.on('click', listenForStateChange);
+      }
+    }
+  };
+}]);

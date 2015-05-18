@@ -373,7 +373,7 @@ angular.module('starter.controllers', [])
     $state.go('app.camera');
   }
 
-  $scope.loginCall = function(){
+  $scope.login = function(){
     $scope.loginBtn = false;
     $state.go('login');
   }

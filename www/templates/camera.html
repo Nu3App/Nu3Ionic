@@ -12,23 +12,45 @@
           Voltar para Home
         </button>
       </div>
-      </div>
-    <div ng-hide="dbResult !== undefined" class="list">
+    </div>
+    <div ng-hide="dbResult !== undefined" class="list no-padding">
       <label class="item item-input item-stacked-label">
         <span class="input-label">Qual é a sua refeição?</span>
         <input type="text" ng-model="photoTitle" placeholder="Descrava seu prato rapidamente...">
       </label>
-    </div>
-      <div class="card" ng-show="blankTitle === true" class="error-message">
-        <div class="item item-text-wrap">
-          Por favor, descreva sua refeição.
+      <div class="row feed-table">
+        <div class="col">
+          <button class="button button-full button-dark"  ng-click="takePicture()">Tirar Foto</button>
         </div>
+        <div class="col">
+          <button class="button button-full button-energized" ng-hide="imgURI === undefined" class="button" ng-click="savePicture()">Salvar</button>
+        </div>
+      </div> 
+    </div>
+    <div class="card" ng-show="blankTitle === true" class="error-message">
+      <div class="item item-text-wrap">
+        Por favor, descreva sua refeição.
       </div>
-        <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
-        <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
-        <button class="button" ng-hide="dbResult !== undefined" ng-click="takePicture()">Take Picture</button>
-        <button ng-hide="imgURI === undefined || dbResult !== undefined" class="button" ng-click="savePicture()">Salvar</button>
+    </div>  
+    <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
+    <img ng-show="imgURI === undefined" ng-src="http://placehold.it/300x300" class="img-preview">
 
-        
-    </ion-content>
+    <div class="row" id="tab-space" ng-style="{'height': '30px'}">
+    </div>
+  </ion-content>
+
+  <div class="tabs-striped tabs-background-energized tabs-color-light">
+      <div class="tabs">
+          <a navClear class="tab-item disable-user-behavior" title="Home" ui-sref="app.photolists">
+            <i class="icon ion-home"></i>Home
+          </a>
+          <a navClear class="tab-item disable-user-behavior" title="Search" ui-sref="app.search">
+            <i class="icon ion-ios-search"></i>Busca
+          </a>
+          <a navClear class="tab-item disable-user-behavior active" title="Camera">
+            <i class="icon ion-ios-camera"></i>Camera
+          </a>
+      </div>
+    </div>
+    
 </ion-view>

@@ -3,7 +3,7 @@
     <!--<label class="pull-right">{{network}}</label>-->
     <div class="card" ng-show="offlineFeed">
       <div class="item item-text-wrap" ng-show="qtd > 0">
-        Você tem {{qtd}} fotos para sincronizar
+        Você tem {{qtd}} <font></font>tos para sincronizar
       </div>
       <div class="item item-text-wrap" ng-show="qtd == 0">
         {{message}}
@@ -36,16 +36,16 @@
       </ion-item>
     </ion-list>
     <ion-list>
-      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider">
+      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider no-padding no-margin no-border">
         <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
-      
-      <ion-list>
-          <div class="card feed-card" ng-show="!day.photos">
-            <div class="item item-text-wrap">
-              <center>Sem coletas nesse dia...</center>
-            </div>
+        <div class="card feed-card" ng-show="!day.photos">
+          <div class="item item-text-wrap">
+            <center>Sem coletas nesse dia...</center>
           </div>
-          <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
+        </div>
+      <ion-list ng-show="day.photos">
+          
+          <!--<ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
             <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
             <div class = "row"><h2><strong>{{photo.nome}}</strong></h2></div>
             <div class = "row">
@@ -57,35 +57,64 @@
                 &nbsp;&nbsp;&nbsp;<i class="icon ion-ios-clock-outline"></i>{{photo.hour}}
               </div>
             </div>
-            
+            -->
               <!--
 
                             <div class = "col-10 col-offset-90" align = "center">
                 <div class = "row"><center><i class="icon ion-ios-clock-outline"></i></center></div>
                 <div class = "row row-center"><center>{{photo.hour}}</center></div>
               </div>-->
-            <div ng-show="photo.ultimoComentario">
+            <!--<div ng-show="photo.ultimoComentario">
               <label>Ultimo Comentário:</label>
-              <p>{{photo.ultimoComentario}}</p>
+              <p>{{photo.ultimoComentario}}</p> 
+            </div>
+          </ion-item> -->
+          <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="feed-item">
+            
+            
+            <div class="row feed-table" id="photo-info">
+              <div class="col col-33 no-padding" id="photo-image">
+                <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+              </div>
+              <div class="col col-67" id="infos">
+                <div class = "row row-top">
+                  <h2><strong>{{photo.nome}}</strong></h2>
+                </div>
+                <div class = "row row-center">
+                  <div class="col col-67">
+                    <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+                    <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+                  </div>
+                  <div class="col col-33">
+                    <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}
+                  </div>
+                </div>
+                <div class = "row row-bottom" ng-show="photo.ultimoComentario">
+                  <div class= "col col-10">
+                    <i class="icon ion-chatbubble"></i>&nbsp;
+                  </div>
+                  <div class = "col col-90">
+                    <h3>{{photo.ultimoComentario}}</h3>
+                  </div>
+                </div>
+              </div>
             </div>
           </ion-item>
+
+
+
         </ion-list>
       </ion-item> 
     </ion-list>
     <ion-infinite-scroll immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>
-    <!--<button class="button button-full button-energized" ng-click="loadList()">
-    Carregar Mais Refeições
-    </button>-->
-  </ion-content>
-  <ion-footer-bar>
-  <div class="tabs tabs-icon-top" ng-click="camera()">
-    <a class="tab-item" >
-      <i class="icon ion-camera"></i>
-      Camera
-    </a>
-  </div>
-  </ion-footer-bar>
+    <!--
+    <div class="bar bar-footer bar-dark footer-button" >
+        <a class="button button-full button-clear button-icon icon ion-camera" ng-click="camera()">
+            &nbsp;Camera
+        </a>
+    </div>
+    -->
    <!--
   <ion-footer-bar align-title="center" class="bar-energized">
  <div class="buttons">
@@ -97,4 +126,18 @@
 
   </ion-footer-bar>
   -->
+  </ion-content>
+  <div class="tabs-striped tabs-background-energized tabs-color-light">
+    <div class="tabs">
+        <a class="tab-item disable-user-behavior active" ui-sref="#">
+          <i class="icon ion-home"></i>Home
+        </a>
+        <a navClear class="tab-item disable-user-behavior" ui-sref="app.search">
+          <i class="icon ion-ios-search"></i>Busca
+        </a>
+        <a navClear class="tab-item disable-user-behavior" ui-sref="app.camera">
+          <i class="icon ion-ios-camera"></i>Camera
+        </a>
+    </div>
+  </div>
 </ion-view>

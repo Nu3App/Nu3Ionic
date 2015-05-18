@@ -2,11 +2,10 @@
 .img-preview{
 	margin-left: auto;
 	margin-right: auto;
-	border-color: black;
-	border-radius: 3px;
-	border-width: 3px;
+	margin-bottom: 50px;
+	border-radius: 10px;
+	border-width: 10px;
 	display: block;
-	max-width: 75%;
 	width: 300px;
 	height: 300px;
 }
@@ -14,21 +13,17 @@
 .img-detail{
 	margin-left: auto;
 	margin-right: auto;
-	border-color: black;
-	border-radius: 3px;
-	border-width: 3px;
+	border-radius: 5px;
+	border-width: 5px;
 	display: block;
-	max-width: 75%;
-	width: 300px;
-	height: 300px;
+	width: 250px;
+	height: 250px;
 }
 
 .img-list{
-	border-color: black;
-	border-radius: 3px;
-	border-width: 1px;
-	width: 100px;
-	height: 100px;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
 }
 
 .hidden{
@@ -39,6 +34,14 @@
     padding: 0px !important;
 }
 
+.no-margin {
+	margin: 0px !important;
+}
+
+.no-border {
+	border: 0px !important;
+}
+
 .feed-divider {
 	padding: 5px 1px 0px 1px !important;
 }
@@ -47,6 +50,16 @@
 	padding: 1px 1px 1px 1px !important;
 	margin: 0px 0px 0px 0px !important;
 }
+
+.feed-table {
+	padding: 0px 0px 0px 0px !important;
+	margin: 0px 0px 0px 0px !important;
+}
+
+.feed-item .item-content {
+  padding: 0 !important;
+}
+
 .black {
 	color: black;
 }
@@ -58,3 +71,9 @@
   background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #FFBD21));
   
 }
+
+div.footer-button a.button.button-full {
+    width:100%;
+    margin-top: 0
+}
+
