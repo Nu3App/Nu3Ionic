@@ -82,13 +82,13 @@ angular.module('starter.controllers', [])
     $scope.$digest();
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
-    /*if($scope.feed.length < 7){
+    if($scope.feed.length < 7){
       console.log("feed muito pequeno, carregando mais dados...");
       $scope.loadMore();
-    }*/
-    //else{
+    }
+    else{
       $ionicLoading.hide();
-    //}
+    }
   });
 
   $rootScope.$on('network:changed', function() {
@@ -117,6 +117,7 @@ angular.module('starter.controllers', [])
 
   DBService.getUser().then(function(){
     $scope.scrollCheck = function(){
+      console.log("Checando Requerimentos para o Scroll Infinito...");
       if($cordovaNetwork.isOnline() && $scope.scroll == true){ //TODO chamar webservice de primeira data.
         return true;
       }

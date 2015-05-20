@@ -26,6 +26,15 @@
 	padding: 0px;
 }
 
+.img-logo{
+	width: 150px;
+	height: 150px;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	padding: 0px;
+}
+
 .hidden{
   display: none;
 }
