@@ -1,4 +1,21 @@
 /* Empty. Add your own CSS if you like */
+.pull-left { float:left }
+.pull-right { float:right }
+.clear { clear:both }
+
+.wrapper {
+	min-height:100%;
+	position:relative;
+}
+.has-botton {
+	padding-bottom:100px;   /* Height of the footer element */
+}
+.botton {
+	width:100%;
+	position:absolute;
+	bottom:0;
+	left:0;
+}
 .img-preview{
 	margin-left: auto;
 	margin-right: auto;

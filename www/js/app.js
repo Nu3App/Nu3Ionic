@@ -94,6 +94,16 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       }
     }
   })
+
+  .state('app.perfil', {
+    url: "/perfil",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/perfil.html",
+        controller: 'PerfilCtrl'
+      }
+    }
+  })
     .state('app.photolists', {
       url: "/photolists",
       views: {

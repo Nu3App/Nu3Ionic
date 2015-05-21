@@ -1,0 +1,30 @@
+<ion-view view-title="Perfil">
+  <ion-content>
+    <div class="list card">
+
+	  <div class="item item-avatar">
+	    <img src="img/avatar.png">
+	    <h2><i class="icon ion-person"></i>{{user.nomeUsuario}}</h2>
+	    <p><i class="icon ion-ios-email"></i>{{user.email}}</p>
+	  </div>
+
+	  <div class="item item-image">
+	    <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
+	  </div>
+
+	  <a class="item item-icon-left assertive" href="#">
+	    <i class="icon ion-music-note"></i>
+	    Start listening
+	  </a>
+
+	</div>
+	<div class="row feed-table">
+        <div class="col">
+          <button class="button button-full button-dark"  ng-click="takePicture()">Tirar Foto</button>
+        </div>
+        <div class="col">
+          <button class="button button-full button-energized" class="button" ng-click="loadPicture()">Carregar Foto</button>
+        </div>
+    </div> 
+  </ion-content>
+</ion-view>

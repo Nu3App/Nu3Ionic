@@ -456,3 +456,26 @@ angular.module('nu3.services', [])
 
   }
 })
+
+.service('CameraService', function($rootScope) {
+  return {
+    encodeImageUri: function(imageUri, callback) {
+      var c = document.createElement('canvas');
+      var ctx = c.getContext("2d");
+      var img = new Image();
+      img.onload = function() {
+          c.width = this.width;
+          c.height = this.height;
+          ctx.drawImage(img, 0, 0);
+
+          if(typeof callback === 'function'){
+              var dataURL = c.toDataURL("image/png");
+              //console.log("DataURL original: " + dataURL);
+              callback(dataURL.slice(22, dataURL.length));
+          }
+      };
+      img.src = imageUri;
+    }
+
+  }
+})

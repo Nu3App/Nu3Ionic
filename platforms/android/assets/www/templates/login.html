@@ -5,29 +5,36 @@
       <!--<button class="button button-clear" ng-click="closeLogin()">Close</button>-->
     </div>
   </ion-header-bar>
-  <ion-content>
-    <img ng-src="img/nu3_icon.png" class="img-logo">
-    <form ng-submit="login()">
-      <div class="card" ng-show="message">
-        <div class="item item-text-wrap">
-          {{message}}
+  <ion-content scroll="false">
+    <div class="wrapper">
+      <div class="has-botton">
+      <img ng-src="img/nu3_icon.png" class="img-logo">
+      <form ng-submit="login()">
+        <div class="card" ng-show="message">
+          <div class="item item-text-wrap">
+            {{message}}
+          </div>
         </div>
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label">Email</span>
+            <input type="text" ng-model="user.email">
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Senha</span>
+            <input type="password" ng-model="user.senha">
+          </label>
+          <label class="feed-item no-border">
+            <button class="button button-block button-energized no-padding" type="submit">Logar</button>
+          </label>
+        </div>
+      </form>
+      <p class="prettyline no-padding"></p>
       </div>
-      <div class="list">
-        <label class="item item-input">
-          <span class="input-label">Email</span>
-          <input type="text" ng-model="user.email">
-        </label>
-        <label class="item item-input">
-          <span class="input-label">Senha</span>
-          <input type="password" ng-model="user.senha">
-        </label>
-        <label class="item">
-          <button class="button button-block button-positive" type="submit">Logar</button>
-        </label>
+      <div class="botton">
+        <center><p>Não tem conta ainda?</p></center>
+        <a href="#/register" class="button button-full button-dark no-padding no-margin">Cadastra-se</a>
       </div>
-    </form>
-    <p>Não tem conta ainda?</p>
-    <a href="#/register" class="button button-block button-positive">Cadastra-se</a>
+    </div>  
   </ion-content>
 </ion-modal-view>

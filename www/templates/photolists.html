@@ -3,14 +3,14 @@
     <!--<label class="pull-right">{{network}}</label>-->
     <div class="card" ng-show="offlineFeed">
       <div class="item item-text-wrap" ng-show="qtd > 0">
-        Você tem {{qtd}} <font></font>tos para sincronizar
+        Você tem {{qtd}} foto(s) para sincronizar
       </div>
       <div class="item item-text-wrap" ng-show="qtd == 0">
         {{message}}
       </div>
       <div class="item item-divider item-energized" ng-show="online && qtd > 0 && !loginBtn" ng-style="{'line-height': '50px'}">
         <button class="button button-clear button-dark" ng-click="sincronizar()">
-          <i class="icon ion-cloud"></i>
+          <i class="icon ion-ios-cloud-upload"></i>
           &nbsp; &nbsp; Sincronizar
         </button>
       </div>
@@ -106,7 +106,7 @@
         </ion-list>
       </ion-item> 
     </ion-list>
-    <ion-infinite-scroll immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
+    <ion-infinite-scroll class="has-tabs" immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>
     <!--
     <div class="bar bar-footer bar-dark footer-button" >

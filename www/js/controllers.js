@@ -69,7 +69,7 @@ angular.module('starter.controllers', [])
   var promiseList = [];
   $scope.feed = [];
   $scope.offlinePhotos = [];
-  $scope.scroll = true;
+  $scope.scroll = false;
   
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
@@ -88,6 +88,7 @@ angular.module('starter.controllers', [])
     }
     else{
       $ionicLoading.hide();
+      $scope.scroll = true;
     }
   });
 
@@ -205,6 +206,7 @@ angular.module('starter.controllers', [])
 }
 
   $scope.loadMore = function (){
+    $scope.scroll = false;
     day = day.add(-1).day();
     var end = day.clone().add(1).day();
     var dayEntry = {
@@ -536,7 +538,7 @@ angular.module('starter.controllers', [])
   });*/  
 })
 
-.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, DBService, ImagensServices) {
+.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, DBService, ImagensServices, CameraService) {
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
         $scope.blankTitle = true;
@@ -577,7 +579,7 @@ angular.module('starter.controllers', [])
     }
 
     function getBase64FromImageUrl(URL) {
-      encodeImageUri(URL, function(base64){
+      CameraService.encodeImageUri(URL, function(base64){
          var id = Date.now();
          var image = {
           'idImagem': id, 
@@ -622,25 +624,51 @@ angular.module('starter.controllers', [])
         }
       });
     }
+})
 
-    encodeImageUri = function(imageUri, callback) {
-      var c = document.createElement('canvas');
-      var ctx = c.getContext("2d");
-      var img = new Image();
-      img.onload = function() {
-          c.width = this.width;
-          c.height = this.height;
-          ctx.drawImage(img, 0, 0);
+.controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService) {
+  $scope.message = "";
+  $scope.user = user;
 
-          if(typeof callback === 'function'){
-              var dataURL = c.toDataURL("image/png");
-              //console.log("DataURL original: " + dataURL);
-              callback(dataURL.slice(22, dataURL.length));
-          }
-      };
-      img.src = imageUri;
+  $scope.takePicture = function() {
+        var options = { 
+            quality : 90, 
+            destinationType : Camera.DestinationType.IMAGE_URI, 
+            sourceType : Camera.PictureSourceType.CAMERA, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+ 
+        $cordovaCamera.getPicture(options).then(function(imageData) {
+            //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+            $scope.imgURI = imageData;
+        }, function(err) {
+            // An error occured. Show a message to the user
+        });
     }
 
-    
+    $scope.loadPicture = function() {
+        var options = { 
+            quality : 90, 
+            destinationType : Camera.DestinationType.IMAGE_URI, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
  
-});
+        $cordovaCamera.getPicture(options).then(function(imageData) {
+            //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+            $scope.imgURI = imageData;
+        }, function(err) {
+            // An error occured. Show a message to the user
+        });
+    }
+})
