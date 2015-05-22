@@ -1,5 +1,5 @@
-<ion-view view-title="Home">
-  <ion-content>
+<ion-view view-title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Home </span>">
+  <ion-content class="has-tabs">
     <!--<label class="pull-right">{{network}}</label>-->
     <div class="card" ng-show="offlineFeed">
       <div class="item item-text-wrap" ng-show="qtd > 0">
@@ -44,31 +44,6 @@
           </div>
         </div>
       <ion-list ng-show="day.photos">
-          
-          <!--<ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="no-padding item item-thumbnail-left">
-            <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
-            <div class = "row"><h2><strong>{{photo.nome}}</strong></h2></div>
-            <div class = "row">
-              <div class="col-75">
-                <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
-                <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
-              </div>
-              <div class="col">
-                &nbsp;&nbsp;&nbsp;<i class="icon ion-ios-clock-outline"></i>{{photo.hour}}
-              </div>
-            </div>
-            -->
-              <!--
-
-                            <div class = "col-10 col-offset-90" align = "center">
-                <div class = "row"><center><i class="icon ion-ios-clock-outline"></i></center></div>
-                <div class = "row row-center"><center>{{photo.hour}}</center></div>
-              </div>-->
-            <!--<div ng-show="photo.ultimoComentario">
-              <label>Ultimo Comentário:</label>
-              <p>{{photo.ultimoComentario}}</p> 
-            </div>
-          </ion-item> -->
           <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="feed-item">
             
             
@@ -86,7 +61,7 @@
                     <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
                   </div>
                   <div class="col col-33">
-                    <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}
+                    <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}&nbsp;
                   </div>
                 </div>
                 <div class = "row row-bottom" ng-show="photo.ultimoComentario">
@@ -94,11 +69,12 @@
                     <i class="icon ion-chatbubble"></i>&nbsp;
                   </div>
                   <div class = "col col-90">
-                    <h3>{{photo.ultimoComentario}}</h3>
+                    <h3>{{photo.ultimoComentario.texto}}</h3>
                   </div>
                 </div>
               </div>
             </div>
+
           </ion-item>
 
 
@@ -127,7 +103,7 @@
   </ion-footer-bar>
   -->
   </ion-content>
-  <div class="tabs-striped tabs-background-energized tabs-color-light">
+  <div class="tabs-striped tabs-background-dark tabs-color-energized">
     <div class="tabs">
         <a class="tab-item disable-user-behavior active" ui-sref="#">
           <i class="icon ion-home"></i>Home

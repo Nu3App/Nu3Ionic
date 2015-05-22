@@ -70,6 +70,7 @@ angular.module('starter.controllers', [])
   $scope.feed = [];
   $scope.offlinePhotos = [];
   $scope.scroll = false;
+  $scope.qtd = 0;
   
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
@@ -99,6 +100,7 @@ angular.module('starter.controllers', [])
       networkType = type;
       if($cordovaNetwork.isOnline()){
         $scope.online = true;
+        if($scope.qtd == 0) ConstructFeed();
       }
       else{
         $scope.online = false;
@@ -116,14 +118,15 @@ angular.module('starter.controllers', [])
     ConstructFeed();
   }
 
-  DBService.getUser().then(function(){
-    $scope.scrollCheck = function(){
-      console.log("Checando Requerimentos para o Scroll Infinito...");
-      if($cordovaNetwork.isOnline() && $scope.scroll == true){ //TODO chamar webservice de primeira data.
+  $scope.scrollCheck = function(){
+      //console.log("Checando Requerimentos para o Scroll Infinito...");
+      if($scope.scroll == true && $cordovaNetwork.isOnline()){ //TODO chamar webservice de primeira data.
         return true;
       }
       else return false;
     }
+
+  DBService.getUser().then(function(){
     ConstructFeed();
   });
 
@@ -288,17 +291,12 @@ angular.module('starter.controllers', [])
         var json = FeedService.buildPhotoJson(imagensData[i]);
         console.log("DEBUG: Pre-json builded!");
         json["index"] = i;
+        json["day"] = imagensData.stamp;
         var basePromise = FeedService.findPhotoBase(json).then(//precisa fazer uma promisse para carregar o base64 do SQLite
           function onFulfilled(json){
             //console.log("DEBUG: Achou a foto? Finally!!!  " + json["idImagem"]);
             //console.log("Imagem: " + JSON.stringify(json));
-            var parsedDate = Date.parse(json.data);
             json['url'] = 'data:image/png;base64,' + json.base64;
-            json['detail_url'] = "#/app/photolists/" + json["idImagem"];
-            json['timestamp'] = parsedDate.getTime();
-            json['data'] = parsedDate.toString("dd/MM - hh:mm");
-            json['day'] = parsedDate.toString("dd/MM");
-            json['hour'] = parsedDate.toString("hh:mm");
             photos.push(json);
           },
           function onRejected(reason){
@@ -538,7 +536,7 @@ angular.module('starter.controllers', [])
   });*/  
 })
 
-.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, DBService, ImagensServices, CameraService) {
+.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService) {
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
         $scope.blankTitle = true;
@@ -557,6 +555,54 @@ angular.module('starter.controllers', [])
       $state.go('app.photolists');
     }
 
+    $scope.loadPicture = function() {
+
+        
+
+        var options = { 
+            quality : 90, 
+            destinationType : Camera.DestinationType.IMAGE_URI, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+ 
+        $cordovaCamera.getPicture(options).then(function(imageData) {
+            //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+            /*CordovaExif.readData(imageData, function(exifObject) {
+                console.log(exifObject);
+            });*/
+            //$scope.when = "true";
+            var dateOptions = {
+              date: new Date(),
+              mode: 'time', // or 'time'
+              maxDate: new Date(),
+              allowOldDates: true,
+              allowFutureDates: false,
+              doneButtonLabel: 'DONE',
+              doneButtonColor: '#F2F3F4',
+              cancelButtonLabel: 'CANCEL',
+              cancelButtonColor: '#000000'
+            };
+
+            //$cordovaDatePicker.show(dateOptions).then(function(date){
+              //  $scope.date = date;
+                //dateOptions.mode = 'time';
+                //$cordovaDatePicker.show(dateOptions).then(function(hour){
+                 // $scope.hour = hour;
+                  $scope.imgURI = imageData;
+                //});
+            //});
+            
+        }, function(err) {
+            // An error occured. Show a message to the user
+        });
+    }
+
     $scope.takePicture = function() {
         var options = { 
             quality : 90, 
@@ -572,9 +618,10 @@ angular.module('starter.controllers', [])
  
         $cordovaCamera.getPicture(options).then(function(imageData) {
             //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+           
             $scope.imgURI = imageData;
         }, function(err) {
-            // An error occured. Show a message to the user
+            console.log("Erro de getPicture...");
         });
     }
 
@@ -585,6 +632,7 @@ angular.module('starter.controllers', [])
           'idImagem': id, 
           'nome': $scope.photoTitle, 
           'base64': base64,
+          'day': Date.today().getTime(),
           'data': new Date().setTimeToNow(), 
           'rating': 0
          }
@@ -629,6 +677,15 @@ angular.module('starter.controllers', [])
 .controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService) {
   $scope.message = "";
   $scope.user = user;
+  if(user.token_date){
+    $scope.user.tokenExp = Date.parse(user.token_date).toString("dd/MM");
+  }
+  else{
+    if(user.dataExpiracao){
+      $scope.user.tokenExp = Date.parse(user.dataExpiracao).toString("dd/MM");
+    }
+  }
+  
 
   $scope.takePicture = function() {
         var options = { 
@@ -672,3 +729,62 @@ angular.module('starter.controllers', [])
         });
     }
 })
+
+.controller('SearchCtrl', function($scope, $rootScope, $state, FeedService, DBService) {
+  $scope.input = {
+    text: null,
+    date: null
+  };
+
+  $scope.message = null;
+
+  var searchPromise = Q.defer().promise;
+
+  $scope.search = function() {
+    //var photos = [];
+    $scope.result = {
+      'qtd' : null,
+      'photos' : []
+    };
+
+    if($scope.input.text != null){
+      //searchPromise = DBService.searchTextPhotos();
+    }
+    else{
+      if($scope.input.date != null){
+        var timestamp = Date.parse($scope.input.date);
+        console.log("Timestamp de procura: " + timestamp.getTime());
+        searchPromise = DBService.searchPhotoByDay(timestamp.getTime());
+      }
+    }
+    searchPromise.then(
+      function onFulfilled(result){
+        console.log("Search fulfilled! ");
+        if(result){
+          console.log("Entrou no if...");
+          console.log("length: " + result.length);
+          $scope.result.qtd = result.length;
+          for (var i = 0; i < result.length; i++){
+            console.log(i + " -> " + result.item(i).title + " comment? : " + result.item(i).last_comment);
+            var image = FeedService.buildPhotoJson(result.item(i));
+            image['url'] = 'data:image/png;base64,' + image.base64;
+            image['nome'] = image.title;
+            $scope.result.photos.push(image);
+            $scope.$digest();
+          }
+          
+        }
+        else{
+           $scope.message = "Não foi encontrado nenhuma refeição nesse dia...";
+           $scope.$digest();
+        }
+      },
+      function onRejected(reason){
+        console.log("A promessa da procura foi rejeitada por algum motivo...");
+      }
+    );
+  }
+
+
+})
+

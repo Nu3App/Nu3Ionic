@@ -21,7 +21,9 @@
         "source": {
             "type": "registry",
             "id": "org.apache.cordova.camera"
-        }
+        },
+        "is_top_level": true,
+        "variables": {}
     },
     "com.brodysoft.sqliteStorage": {
         "source": {
@@ -35,5 +37,46 @@
             "type": "registry",
             "id": "org.apache.cordova.network-information"
         }
+    },
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-whitelist"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-splashscreen": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-splashscreen"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.file": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.file"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.plugin.datepicker": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/VitaliiBlagodir/cordova-plugin-datepicker.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-crosswalk-webview": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-crosswalk-webview"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

@@ -81,7 +81,8 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
     url: "/search",
     views: {
       'menuContent': {
-        templateUrl: "templates/search.html"
+        templateUrl: "templates/search.html",
+        controller: 'SearchCtrl'
       }
     }
   })

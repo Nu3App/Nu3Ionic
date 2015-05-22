@@ -1,4 +1,4 @@
-<ion-view view-title="Camera">
+<ion-view view-title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Camera </span>">
   <ion-content ng-controller="PictureCtrl">
     <div class="card" ng-show="dbResult !== undefined" class="error-message">
       <div class="item item-divider">
@@ -18,14 +18,21 @@
         <span class="input-label">Qual é a sua refeição?</span>
         <input type="text" ng-model="photoTitle" placeholder="Descrava seu prato rapidamente...">
       </label>
-      <div class="row feed-table">
-        <div class="col">
-          <button class="button button-full button-dark"  ng-click="takePicture()">Tirar Foto</button>
-        </div>
-        <div class="col">
-          <button class="button button-full button-energized" ng-hide="imgURI === undefined" class="button" ng-click="savePicture()">Salvar</button>
-        </div>
-      </div> 
+      <div class="button-bar no-padding">
+        <a class="button button-dark"  ng-click="takePicture()">
+          Tirar Foto &nbsp;
+          <i class="icon ion-ios-camera"></i>
+        </a>
+        <a class="button button-dark" class="button" ng-click="loadPicture()">
+          Carregar Foto &nbsp;
+          <i class="icon ion-folder"></i>
+        </a>
+      </div>
+      <label class="item item-input item-stacked-label" ng-show="when">
+        <span class="input-label">Quando essa refeição foi feita?</span>
+        <input type="datetime" ng-model="photoTime" placeholder="Selecione um dia e hora...">
+      </label>
+      <button class="button button-full button-energized icon-right ion-archive" ng-hide="imgURI === undefined" class="button" ng-click="savePicture()">Salvar</button>
     </div>
     <div class="card" ng-show="blankTitle === true" class="error-message">
       <div class="item item-text-wrap">
@@ -38,7 +45,7 @@
     </div>
   </ion-content>
 
-  <div class="tabs-striped tabs-background-energized tabs-color-light">
+  <div class="tabs-striped tabs-background-dark tabs-color-energized">
       <div class="tabs">
           <a navClear class="tab-item disable-user-behavior" title="Home" ui-sref="app.photolists">
             <i class="icon ion-home"></i>Home

@@ -1,11 +1,69 @@
-<ion-view title="Busca">
-    <ion-content>
-        <h2>Search Page: </h2>
-        <p><i class="icon ion-code-working"></i> In development <i class="icon ion-code-working"></i></p>
+<ion-view title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Busca </span>">
+    <ion-content class="has-tabs">
+        <div class="card">
+          <div class="item item-text-wrap">
+            <i class="icon ion-code-working"></i> Pagina em desenvolvimento!<i class="icon ion-code-working"></i>
+            <p>Bugs e falta de funcionalidades é esperado!</p>
+          </div>
+        </div>
+        <form ng-submit="search()">
+            <div class="list">
+                <!--<label class="item item-input">
+                  <i class="icon ion-search placeholder-icon"></i>
+                  <input type="search" placeholder="Search" ng-model="input.text">
+                </label>-->
+                <label class="item item-input">
+                  <span class="input-label">Procurar pelo dia:</span>
+                  <input type="date" ng-model="input.date">
+                </label>
+            </div>
+            <label class="feed-item no-border">
+                <button class="button button-block button-energized no-padding" type="submit">Procurar</button>
+            </label>
+        </form>
+        <div class="card" ng-show="message">
+          <div class="item item-text-wrap">
+            {{message}}
+          </div>
+        </div>
+        <ion-list ng-show="result.photos">
+          <ion-item ng-repeat="photo in result.photos" href="{{photo.detail_url}}" class="feed-item">
+            <div class="row feed-table" id="photo-info">
+              <div class="col col-33 no-padding" id="photo-image">
+                <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+              </div>
+              <div class="col col-67" id="infos">
+                <div class = "row row-top">
+                  <h2><strong>{{photo.nome}}</strong></h2>
+                </div>
+                <div class = "row row-center">
+                  <div class="col col-67">
+                    <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+                    <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+                  </div>
+                  <div class="col col-33">
+                    <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}
+                  </div>
+                </div>
+                <div class = "row row-bottom" ng-show="photo.last_comment">
+                  <div class= "col col-10">
+                    <i class="icon ion-chatbubble"></i>&nbsp;
+                  </div>
+                  <div class = "col col-90">
+                    <h3>{{photo.last_comment}}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ion-item>
+
+
+
+        </ion-list>
   
       
     </ion-content>
-    <div class="tabs-striped tabs-background-energized tabs-color-light">
+    <div class="tabs-striped tabs-background-dark tabs-color-energized">
     <div class="tabs">
         <a navClear class="tab-item disable-user-behavior" title="Home" ui-sref="app.photolists">
           <i class="icon ion-home"></i>Home

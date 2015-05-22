@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="com.ionicframework.nu3ionic337568" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Nu3Ionic</name>
+  <name>Nu3 App</name>
   <description>
         Projeto de acompanhamento nutricional.
     </description>
@@ -9,13 +9,14 @@
     </author>
   <content src="index.html"/>
   <access origin="*"/>
+  <allow-navigation href="*" />
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="SplashScreenDelay" value="3000"/>
-  <preference name="orientation" value="portrait" />
+  <preference name="orientation" value="portrait"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
@@ -26,17 +27,11 @@
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" density="xhdpi"/>
     <icon src="resources/android/icon/drawable-xxhdpi-icon.png" density="xxhdpi"/>
     <icon src="resources/android/icon/drawable-xxxhdpi-icon.png" density="xxxhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-ldpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-mdpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-hdpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-xhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-xxhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="land-xxxhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-ldpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-mdpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-hdpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-xhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-xxhdpi"/>
-    <splash src="resources/android/splash/splash.png" density="port-xxxhdpi"/>
+    <splash src="resources\android\splash\drawable-port-ldpi-screen.png" density="port-ldpi"/>
+    <splash src="resources\android\splash\drawable-port-mdpi-screen.png" density="port-mdpi"/>
+    <splash src="resources\android\splash\drawable-port-hdpi-screen.png" density="port-hdpi"/>
+    <splash src="resources\android\splash\drawable-port-xhdpi-screen.png" density="port-xhdpi"/>
+    <splash src="resources\android\splash\drawable-port-xxhdpi-screen.png" density="port-xxhdpi"/>
+    <splash src="resources\android\splash\drawable-port-xxxhdpi-screen.png" density="port-xxxhdpi"/>
   </platform>
 </widget>

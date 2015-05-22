@@ -152,7 +152,7 @@ angular.module('nu3.services', [])
       try{    
         self.db = $cordovaSQLite.openDB("my.db"); 
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS users (ID TEXT PRIMARY KEY, nomeUsuario TEXT, email TEXT, token TEXT, token_date DATETIME)");
-        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, data TEXT, rating INTEGER, synchronized INTEGER)");
+        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, data TEXT, day_timestamp INTEGER, last_comment TEXT, last_comment_id TEXT, rating INTEGER, synchronized INTEGER)");
         def.resolve(true);
       }catch(e){
         def.reject(e);
@@ -245,6 +245,28 @@ angular.module('nu3.services', [])
     return deferred.promise;
   },
 
+  self.searchPhotoByDay = function(timestamp){
+    var deferred = Q.defer();
+    var query = "SELECT * FROM photos WHERE day_timestamp=?";
+    $cordovaSQLite.execute(self.db, query, [timestamp]).then(function(res) {
+        var len = res.rows.length;
+          console.log("DB: resulted " + len + " from day " + timestamp + "!");
+          if(len>0){
+            //console.log("DB: Photo with id " + idImagem + " loaded.");
+            //console.log("ROW: " + JSON.stringify(row));
+            //deferred.resolve(result.rows.item(0)['base64']);
+            deferred.resolve(res.rows);
+          }
+          else{
+            deferred.resolve(null);
+          }
+    }, function (err) {
+        console.error("Photo " + json.idImagem + " ERRO ao carragar do banco de dados!!!");
+        console.error(JSON.stringify(err));
+    });    
+    return deferred.promise;
+  },
+
   self.updatePhoto = function(idImagem, novaID){
     var deferred = Q.defer();
     console.log("DB -> Updating photo infos from " + idImagem + " to " + novaID);
@@ -262,10 +284,10 @@ angular.module('nu3.services', [])
   },
 
   self.addPhoto = function(json, base64, mode){
-    console.log("DB: Adding photo with id " + json.idImagem);
+    console.log("DB: Adding photo with id " + json.idImagem + " do dia: " + json.day);
     var deferred = Q.defer();
-    var query = "INSERT INTO photos(ID, title, base64, data, rating, synchronized) VALUES (?,?,?,?,?,?)";
-    $cordovaSQLite.execute(self.db, query, [json.idImagem, json.nome, base64, json.data, json.rating, mode]).then(function(res) {
+    var query = "INSERT INTO photos(ID, title, base64, data, day_timestamp, rating, synchronized) VALUES (?,?,?,?,?,?,?)";
+    $cordovaSQLite.execute(self.db, query, [json.idImagem, json.nome, base64, json.data, json.day, json.rating, mode]).then(function(res) {
         //console.log("Photo " + json.idImagem + " adicionado no banco de dados com sucesso!");
         deferred.resolve(true);
     }, function (err) {
@@ -279,8 +301,23 @@ angular.module('nu3.services', [])
   self.updateRating = function(id, rating){
     var deferred = Q.defer();
     var query = "UPDATE photos SET rating= ? WHERE ID = ?";
-    $cordovaSQLite.execute(self.db, query, [id, rating]).then(function(res) {
+    $cordovaSQLite.execute(self.db, query, [rating, id]).then(function(res) {
         console.log("Atualizado rating da foto " + id);
+        deferred.resolve(true);
+    }, function (err) {
+        console.error("Falha ao atualizar ratinda da imagem " + id);
+        console.error(JSON.stringify(err));
+        deferred.reject(err);
+    });    
+    return deferred.promise;
+  },
+
+  self.updateComment = function(id, comment){
+    var deferred = Q.defer();
+    console.log("Updating Comment ( "+ comment.texto + ") from photo " + id);
+    var query = "UPDATE photos SET last_comment = ?, last_comment_id = ? WHERE ID = ?";
+    $cordovaSQLite.execute(self.db, query, [comment.texto, comment.idComentario, id]).then(function(res) {
+        console.log("Atualizado comment da foto " + id);
         deferred.resolve(true);
     }, function (err) {
         console.error("Falha ao atualizar ratinda da imagem " + id);
@@ -371,9 +408,17 @@ angular.module('nu3.services', [])
           if(j <= json.rating) json["stars"].push(1);
           else json["starsEmpty"].push(1);
         }
-        if(json.hasOwnProperty('ultimoComentario')){
-          json["ultimoComentario"] = json["ultimoComentario"].texto; //tira do dicionario somente a parte importante
+        var parsedDate = Date.parse(json.data);
+        if(json.idImagem){
+          console.log("Building photo with idImagem: " + json.idImagem);
+          json['detail_url'] = "#/app/photolists/" + json["idImagem"];
         }
+        else{
+          //console.log("Building photo with ID: " + json["ID"]);
+          json['detail_url'] = "#/app/photolists/" + json["ID"];
+        }
+        json['timestamp'] = parsedDate.getTime();
+        json['hour'] = parsedDate.toString("hh:mm");
         return json;
     },
 
@@ -386,8 +431,17 @@ angular.module('nu3.services', [])
               json["base64"] = result["base64"];
               if(json["rating"] != result["rating"]){
                 console.log("Atualizando rating da foto");
-                ImagensServices.updateRating(json.idImagem, json.rating);
+                DBService.updateRating(json.idImagem, json.rating);
               }
+              
+              if(json.ultimoComentario){
+                console.log("Ultimo comentario info: " + JSON.stringify(json.ultimoComentario));
+                if(json["ultimoComentario"].idComentario != result["last_comment_id"]){
+                  console.log("Novo comentario!");
+                  DBService.updateComment(json.idImagem, json.ultimoComentario);
+                }
+              }
+              
               //console.log("Base64 já existente no banco de dados");
               deferred.resolve(json);
             }
@@ -399,10 +453,10 @@ angular.module('nu3.services', [])
                   if (base != null){
                     //console.log("Teste base: " + base.slice(0,10) + ".....");
                     json["base64"] = base;
-                    
                     DBService.addPhoto(json, base, 1).then(
                       function(){
                         console.log("Base da imagem" + json.idImagem + "adicionada no banco de dados...");
+                        DBService.updateComment(json.idImagem, json.ultimoComentario);
                       }
                     );
                     deferred.resolve(json);

@@ -16,6 +16,20 @@
 	bottom:0;
 	left:0;
 }
+
+.energized-background{
+	background-color: #ffc900;
+}
+
+.energized-text{
+	color: #ffc900 !important;
+}
+
+.header-title{
+	position: relative;
+	top: -10px;
+}
+
 .img-preview{
 	margin-left: auto;
 	margin-right: auto;
@@ -25,6 +39,18 @@
 	display: block;
 	width: 300px;
 	height: 300px;
+}
+
+.img-avatar{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+    top: 10px;
+    max-width: 150px;
+    max-height: 150px;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }
 
 .img-detail{
@@ -46,6 +72,15 @@
 .img-logo{
 	width: 150px;
 	height: 150px;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	padding: 0px;
+}
+
+.menu-logo{
+	width: 100px;
+	height: 100px;
 	margin-left: auto;
 	margin-right: auto;
 	display: block;

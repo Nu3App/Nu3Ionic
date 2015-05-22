@@ -1,4 +1,11 @@
 {
   "name": "Nu3Ionic",
-  "app_id": "46abce46"
+  "app_id": "46abce46",
+  "browsers": [
+    {
+      "platform": "android",
+      "browser": "crosswalk",
+      "version": "12.41.296.5"
+    }
+  ]
 }
