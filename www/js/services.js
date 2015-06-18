@@ -1,4 +1,5 @@
-var urlService = "http://200.144.93.244/nutri-rest-patient/rest/";
+var urlService = "http://nu3.unifesp.br/nutri-rest-patient/rest/"
+//"http://200.144.93.244/nutri-rest-patient/rest/";
 //login: "auth/loginUsuario"
 //cadastro: 
 

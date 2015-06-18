@@ -37,19 +37,20 @@ angular.module('starter.controllers', [])
   DBService.status().then(function(){
     console.log("Promessa do banco de dados cumprida...");
     //UserService.init();
-    var userPromise = DBService.loadUser();
-    var today = Date.today();
-    userPromise.then(function(userResult){
+    DBService.loadUser().then(function(userResult){
+        console.log("User promise fulfilled!");
         $ionicLoading.hide();
-        if($cordovaNetwork.isOnline()){
+        /*if($cordovaNetwork.isOnline()){
           $scope.network = 'Online';
         }
-        else $scope.network = 'Offline';
-
-        if(userResult){
+        else{
+          $scope.network = 'Offline';
+        } 
+        */
+        if(userResult != null){
           user = userResult;
-          console.log("User loaded = " + JSON.stringfy(userResult));
           $rootScope.token = user.token;
+          var today = Date.today();
           console.log(Date.parse(userResult.token_date).getTime() + '>' + today.getTime());
         }
         else{
@@ -126,7 +127,8 @@ angular.module('starter.controllers', [])
       else return false;
     }
 
-  DBService.getUser().then(function(){
+  DBService.getUser().then(function(userResult){
+    console.log("Usuario carregado: " + JSON.stringify(userResult));
     ConstructFeed();
   });
 
@@ -206,7 +208,7 @@ angular.module('starter.controllers', [])
         } 
       }
     })
-}
+  }
 
   $scope.loadMore = function (){
     $scope.scroll = false;
@@ -374,7 +376,8 @@ angular.module('starter.controllers', [])
     $state.go('app.camera');
   }
 
-  $scope.login = function(){
+  $scope.goLogin = function(){
+    console.log("Mudando pargina para login!");
     $scope.loginBtn = false;
     $state.go('login');
   }
@@ -393,6 +396,10 @@ angular.module('starter.controllers', [])
 
   $scope.commentField = {
     text: ''
+  }
+
+  $scope.styles = {
+
   }
 
   $scope.comentar = function(){
