@@ -73,6 +73,7 @@ angular.module('starter.controllers', [])
   $scope.scroll = false;
   $scope.qtd = 0;
   $scope.emptyDays = null;
+
   var emptySince = null;
 
   $rootScope.$on('todo:listChanged', function() {
@@ -131,6 +132,7 @@ angular.module('starter.controllers', [])
 
   DBService.getUser().then(function(userResult){
     console.log("Usuario carregado: " + JSON.stringify(userResult));
+    $scope.me = userResult.nomeUsuario;
     ConstructFeed();
   });
 
@@ -151,7 +153,7 @@ angular.module('starter.controllers', [])
       emptySince = day;
     }
     else{
-      $scope.emptyDays = "Sem coletas do dia " + emptySince + " até " + day;
+      $scope.emptyDays = "Sem coletas do dia " + day + " até " + emptySince;
     }
     
   }
@@ -240,7 +242,8 @@ angular.module('starter.controllers', [])
     var end = day.clone().add(1).day();
     var dayEntry = {
       photos: [],
-      label: day.toString("dd/MM") 
+      label: day.toString("dd/MM"),
+      cycle: null 
     }
     $ionicLoading.show({
         content: 'Loading Data',
@@ -255,18 +258,19 @@ angular.module('starter.controllers', [])
           console.log("AJAX promise fulfulled!");
           prepareFeed(ajaxData).then(function(photos){
             if(photos){
+              console.log("Dia " + day.toString("dd/MM") + "não vazio");
               dayEntry.photos = photos;
               if($scope.emptyDays){
                 dayEntry.cycle = $scope.emptyDays;
                 $scope.emptyDays = null;
               }
               $scope.feed.push(dayEntry);
+              console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
             }
             else{
               buildEmptyCycle(dayEntry.label);
             }
-             console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
-             $scope.$emit('todo:listAdded');
+            $scope.$emit('todo:listAdded');
           });
 
         },
@@ -602,10 +606,7 @@ angular.module('starter.controllers', [])
       $state.go('app.photolists');
     }
 
-    $scope.loadPicture = function() {
-
-        
-
+    $scope.loadPicture = function() {       
         var options = { 
             quality : 90, 
             destinationType : Camera.DestinationType.IMAGE_URI, 
@@ -614,36 +615,18 @@ angular.module('starter.controllers', [])
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 300,
             targetHeight: 300,
-            popoverOptions: CameraPopoverOptions,
+            //popoverOptions: CameraPopoverOptions,
             saveToPhotoAlbum: false
-        };
- 
+        }; 
+        
         $cordovaCamera.getPicture(options).then(function(imageData) {
             //$scope.imgURI = "data:image/jpeg;base64," + imageData;
-            /*CordovaExif.readData(imageData, function(exifObject) {
-                console.log(exifObject);
-            });*/
             //$scope.when = "true";
-            var dateOptions = {
-              date: new Date(),
-              mode: 'time', // or 'time'
-              maxDate: new Date(),
-              allowOldDates: true,
-              allowFutureDates: false,
-              doneButtonLabel: 'DONE',
-              doneButtonColor: '#F2F3F4',
-              cancelButtonLabel: 'CANCEL',
-              cancelButtonColor: '#000000'
-            };
-
-            //$cordovaDatePicker.show(dateOptions).then(function(date){
-              //  $scope.date = date;
-                //dateOptions.mode = 'time';
-                //$cordovaDatePicker.show(dateOptions).then(function(hour){
-                 // $scope.hour = hour;
-                  $scope.imgURI = imageData;
-                //});
-            //});
+            CordovaExif.readData(imageData, function(exifObject) {
+              console.log("EXIF: " + exifObject);
+            });
+          $scope.imgURI = imageData;
+                
             
         }, function(err) {
             // An error occured. Show a message to the user
@@ -724,6 +707,10 @@ angular.module('starter.controllers', [])
 .controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService) {
   $scope.message = "";
   $scope.user = user;
+  $scope.imgURI = null;
+  $scope.perfilPhoto = null;
+
+  console.log("Usuario: " + JSON.stringify(user));
   if(user.token_date){
     $scope.user.tokenExp = Date.parse(user.token_date).toString("dd/MM");
   }
@@ -732,7 +719,36 @@ angular.module('starter.controllers', [])
       $scope.user.tokenExp = Date.parse(user.dataExpiracao).toString("dd/MM");
     }
   }
-  
+  DBService.getPerfil(user.ID).then(
+    function onSucess(data){
+      console.log("perfil carregado!");
+      if(data.perfil != null){
+        console.log("Perfil carregado: " + JSON.stringify(data.perfil));
+        $scope.perfilPhoto = "data:image/jpeg;base64," + data.perfil;
+        $scope.$digest();
+      }
+
+    }
+        
+  );
+
+  $scope.savePicture = function(){
+    var imgURI = $scope.imgURI;
+    console.log("Img URI: " + imgURI);
+    CameraService.encodeImageUri(imgURI, function(base64){ 
+      //chama webservice
+      //salva no banco de dados
+      DBService.addPerfil(user.ID, base64).then(
+        function onSucess(){
+          $scope.perfilPhoto = "data:image/jpeg;base64," + base64;
+          $scope.imgURI = null;
+          $scope.photoSaved = true;
+          $scope.$digest();
+          console.log("Perfil salvo no banco de dados com sucesso.");
+        } 
+      );
+    });
+  }
 
   $scope.takePicture = function() {
         var options = { 

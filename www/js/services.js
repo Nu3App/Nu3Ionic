@@ -153,6 +153,7 @@ angular.module('nu3.services', [])
       try{    
         self.db = $cordovaSQLite.openDB("my.db"); 
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS users (ID TEXT PRIMARY KEY, nomeUsuario TEXT, email TEXT, token TEXT, token_date DATETIME)");
+        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS perfils (ID TEXT PRIMARY KEY, perfil TEXT)");
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, data TEXT, day_timestamp INTEGER, last_comment TEXT, last_comment_id TEXT, rating INTEGER, synchronized INTEGER)");
         def.resolve(true);
       }catch(e){
@@ -166,6 +167,34 @@ angular.module('nu3.services', [])
 
   self.status = function(){
     return def.promise;
+  }
+
+  self.addPerfil = function(id, perfil){
+    var deferred = Q.defer();
+    console.log("DB: Inserting perfil of user id: " + id);
+    //pensar em um jeito de deixar uma tabela single row, talvez com um index fixo...
+    var query = "INSERT OR REPLACE INTO perfils (ID,perfil) VALUES (?,?)"; //ID TEXT PRIMARY KEY, username TEXT, email TEXT, token TEXT, token_date DATETIME
+    $cordovaSQLite.execute(self.db, query, [id, perfil]).then(function(res) {
+        console.log("INSERT ID -> " + res.insertId);
+        deferred.resolve(res);
+    }, function (err) {
+        console.error(JSON.stringify(err));
+        deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+
+  self.getPerfil = function(id){
+    var deferred = Q.defer();
+    console.log("DB: loading perfil from user: " + id);
+    var query = "SELECT perfil FROM perfils WHERE ID = ?";
+    $cordovaSQLite.execute(self.db, query, [id]).then(function(res) {
+      deferred.resolve(res.rows.item(0));
+    }, function (err) {
+        console.error(JSON.stringify(err));
+        deferred.reject(err);
+    });
+    return deferred.promise;
   }
 
   self.insertUser = function(userEntry) {
@@ -439,6 +468,7 @@ angular.module('nu3.services', [])
                 console.log("Ultimo comentario info: " + JSON.stringify(json.ultimoComentario));
                 if(json["ultimoComentario"].idComentario != result["last_comment_id"]){
                   console.log("Novo comentario!");
+                  json["newComment"] = true;
                   DBService.updateComment(json.idImagem, json.ultimoComentario);
                 }
               }

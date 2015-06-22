@@ -36,8 +36,16 @@
       </ion-item>
     </ion-list>
     <ion-list>
-      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider no-padding no-margin no-border">
-        <div id="dayEntry" ng-show="!day.cycle">
+      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider">
+        <div id="dayCycle" ng-show="day.cycle">
+          <h3 class="black"><center>Período sem coletas!</center></h3>
+          <div class="">
+            <div class="item item-text-wrap" ng-style="{'padding-top': '2px !important', 'padding-bottom': '2px !important'}">
+              <center>{{day.cycle}}</center>
+            </div>
+          </div>
+        </div>
+        <div id="dayEntry" ng-style="{'padding-top': '2px'}">
           <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
           <div class="card feed-card" ng-show="!day.photos">
             <div class="item item-text-wrap">
@@ -64,11 +72,12 @@
                     </div>
                   </div>
                   <div class = "row row-bottom" ng-show="photo.ultimoComentario">
-                    <div class= "col col-10">
-                      <i class="icon ion-chatbubble"></i>&nbsp;
-                    </div>
-                    <div class = "col col-90">
-                      <h3>{{photo.ultimoComentario.texto}}</h3>
+                    <div class = "col">
+                      <h2 ng-show = "photo.newComment" class="energized-text"> <i class="icon ion-chatbubble"></i>&nbsp; NOVO! </h2>
+                      <div id="bubble" ng-class="photo.ultimoComentario.nomeUsuario == me ? 'bubble2' : 'bubble'">
+                        <h3> <strong>{{photo.ultimoComentario.nomeUsuario}}:</strong></h3>
+                        <h3>{{photo.ultimoComentario.texto}}</h3>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -76,18 +85,15 @@
             </ion-item>
           </ion-list>
         </div> <!--DayEntry -->
-        <div id="dayCycle" ng-show="day.cycle">
-          <h3 class="black"><center>Período sem coletas!</center></h3>
-          <div class="card feed-card">
-            <div class="item item-text-wrap">
-              <center>{{day.cycle}}</center>
-            </div>
-          </div>
-        </div>
+        
       </ion-item> 
     </ion-list>
     <div id="EmptyDaysCheck" ng-show="emptyDays">
-      {{emptyDays}}
+      <div class="card feed-card">
+          <div class="item item-text-wrap">
+              <center>{{emptyDays}}</center>
+          </div>
+      </div>
     </div>
     <ion-infinite-scroll class="has-tabs" immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>

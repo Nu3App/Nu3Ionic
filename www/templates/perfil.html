@@ -3,8 +3,10 @@
     <div class="list card">
 
 	  <div class="item item-image">
-	    <img ng-show="imgURI === undefined" class="img-avatar" src="img/avatar.png">
-	    <img ng-show="imgURI !== undefined" class="img-avatar" ng-src="{{imgURI}}">
+	    <img ng-show="perfilPhoto === null" class="img-avatar" src="img/avatar.png">
+	    <img ng-show="perfilPhoto !== null" class="img-avatar" src="{{perfilPhoto}}">
+	    <center><i class="ion-arrow-down-a" ng-show="imgURI !== null"></i></center>
+	    <img ng-show="imgURI !== null" class="img-avatar" ng-src="{{imgURI}}">
 	  </div>
 	  <div class="feed-item">
 	  		<div class="button-bar no-padding">
@@ -17,9 +19,12 @@
 				<i class="icon ion-folder"></i>
 				</a>
 	  		</div>
-	  		<button class="button button-full button-energized icon-right ion-archive" class="button" ng-click="savePicture()" ng-show="imgURI !== undefined">
+	  		<button class="button button-full button-energized icon-right ion-archive" class="button" ng-click="savePicture()" ng-show="imgURI !== null">
 	  		Salvar
 	  		</button>
+	  </div>
+	  <div class="item" ng-show = "photoSaved && imgURI !== null">
+		<center><h2>Foto de perfil salvo com sucesso!</h2></center>
 	  </div>
 	  <div class="item item-icon-left">
 		<h2><i class="icon ion-person"></i>{{user.nomeUsuario}}</h2>
@@ -29,11 +34,6 @@
 	  </div>
 	  <div class="item item-icon-left">
 		<p><i class="icon ion-ios-unlocked"></i>Sessão válida até: <span class="item-note">{{user.tokenExp}}</span></p>
-	  </div>
-	  <div class="item item-icon-left">
-	    <i class="icon ion-ios-telephone"></i>
-	    <p ng-show="user.phone !== undefined">{{user.phone}}</p>
-	    <p ng-show="user.phone === undefined">Não informado...</p>
 	  </div>
 	</div>
 	

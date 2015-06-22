@@ -37,7 +37,7 @@
 	      </li>
 	  </ul>
 	  <p class="clear"></p>
-	<div class="list list-inset">
+	<div class="list list-inset" ng-show="commentable">
 		<div class="item item-text-wrap" ng-show="warning === true">
           		Por favor, escreva algo antes de comentar.
         </div>
@@ -46,9 +46,12 @@
 		    <input type="text" placeholder="Comente algo..." ng-model="commentField.text">
 		</label>
 	</div>
-	<button class="button button-full button-energized icon-right ion-android-send"  ng-click="comentar()">
+	<button class="button button-full button-energized icon-right ion-android-send"  ng-click="comentar()" ng-show="commentable">
   		Comentar
 	</button>
+	<div class="item item-text-wrap" ng-show="!commentable">
+        Novo comentário desativado para refeições feitas a mais de uma semana.
+    </div>
 	
 	<!--
 	  	<label class="item item-input">

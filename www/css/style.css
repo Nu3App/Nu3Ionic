@@ -104,12 +104,15 @@
 }
 
 .feed-divider {
-	padding: 5px 1px 0px 1px !important;
+	padding: 5px 1px 1px 1px !important;
+}
+.feed-divider .h3 {
+	margin-top: 1px !important;
 }
 
 .feed-card {
 	padding: 1px 1px 1px 1px !important;
-	margin: 0px 0px 0px 0px !important;
+	margin: 0px 0px 1px 0px !important;
 }
 
 .feed-table {
@@ -193,7 +196,7 @@ div.footer-button a.button.button-full {
 		vertical-align: top;
 		margin: 10px 10px;
 		border-color: #cdecb0;
-		width: 60%;
+		width: 80%;
 		
 	}
 
@@ -234,7 +237,7 @@ float:right;
 
 .bubble2{
 		float: right;
-		width: 60%;
+		width: 80%;
 		background-color: #ffc900;
 		border-radius: 5px;
 		box-shadow: 0 0 6px #B2B2B2;
