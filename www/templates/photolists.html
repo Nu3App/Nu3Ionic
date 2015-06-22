@@ -37,51 +37,58 @@
     </ion-list>
     <ion-list>
       <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider no-padding no-margin no-border">
-        <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
-        <div class="card feed-card" ng-show="!day.photos">
-          <div class="item item-text-wrap">
-            <center>Sem coletas nesse dia...</center>
+        <div id="dayEntry" ng-show="!day.cycle">
+          <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
+          <div class="card feed-card" ng-show="!day.photos">
+            <div class="item item-text-wrap">
+              <center>Sem coletas nesse dia...</center>
+            </div>
+          </div>
+          <ion-list ng-show="day.photos">
+            <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="feed-item">
+              <div class="row feed-table" id="photo-info">
+                <div class="col col-33 no-padding" id="photo-image">
+                  <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
+                </div>
+                <div class="col col-67" id="infos">
+                  <div class = "row row-top">
+                    <h2><strong>{{photo.nome}}</strong></h2>
+                  </div>
+                  <div class = "row row-center">
+                    <div class="col col-67">
+                      <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
+                      <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+                    </div>
+                    <div class="col col-33">
+                      <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}&nbsp;
+                    </div>
+                  </div>
+                  <div class = "row row-bottom" ng-show="photo.ultimoComentario">
+                    <div class= "col col-10">
+                      <i class="icon ion-chatbubble"></i>&nbsp;
+                    </div>
+                    <div class = "col col-90">
+                      <h3>{{photo.ultimoComentario.texto}}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ion-item>
+          </ion-list>
+        </div> <!--DayEntry -->
+        <div id="dayCycle" ng-show="day.cycle">
+          <h3 class="black"><center>Período sem coletas!</center></h3>
+          <div class="card feed-card">
+            <div class="item item-text-wrap">
+              <center>{{day.cycle}}</center>
+            </div>
           </div>
         </div>
-      <ion-list ng-show="day.photos">
-          <ion-item ng-repeat="photo in day.photos" href="{{photo.detail_url}}" class="feed-item">
-            
-            
-            <div class="row feed-table" id="photo-info">
-              <div class="col col-33 no-padding" id="photo-image">
-                <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-list">
-              </div>
-              <div class="col col-67" id="infos">
-                <div class = "row row-top">
-                  <h2><strong>{{photo.nome}}</strong></h2>
-                </div>
-                <div class = "row row-center">
-                  <div class="col col-67">
-                    <i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
-                    <i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
-                  </div>
-                  <div class="col col-33">
-                    <i class="icon ion-ios-clock-outline"></i>&nbsp;{{photo.hour}}&nbsp;
-                  </div>
-                </div>
-                <div class = "row row-bottom" ng-show="photo.ultimoComentario">
-                  <div class= "col col-10">
-                    <i class="icon ion-chatbubble"></i>&nbsp;
-                  </div>
-                  <div class = "col col-90">
-                    <h3>{{photo.ultimoComentario.texto}}</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </ion-item>
-
-
-
-        </ion-list>
       </ion-item> 
     </ion-list>
+    <div id="EmptyDaysCheck" ng-show="emptyDays">
+      {{emptyDays}}
+    </div>
     <ion-infinite-scroll class="has-tabs" immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>
     <!--

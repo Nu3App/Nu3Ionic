@@ -25,14 +25,18 @@
 	    </div>  
 	  	
     </div>
-    
-      <p ng-repeat="comment in comentarios">
-	   <!-- ng-class="$variableToEvaluate ? 'class-if-true' : 'class-if-false'"> -->
-        <small>{{comment.dataEnvio}}</small> 
-        <span class="author" id="{{comment.idComentario}}"><strong>{{comment.nomeUsuario}}: </strong></span>
-        {{comment.texto}}
-      </p>
-	  
+      <ul class="ulChat">
+	      <li ng-repeat="comment in comentarios">
+		   <!-- ng-class="$variableToEvaluate ? 'class-if-true' : 'class-if-false'"> -->
+		   	<div id="bubble" ng-class="comment.nomeUsuario == me ? 'bubble2' : 'bubble'">
+		        <small>{{comment.dataEnvio}}</small> 
+		        <span class="author" id="{{comment.idComentario}}"><strong>{{comment.nomeUsuario}}: </strong></span>
+		        <br>
+		        {{comment.texto}}
+	        </div>
+	      </li>
+	  </ul>
+	  <p class="clear"></p>
 	<div class="list list-inset">
 		<div class="item item-text-wrap" ng-show="warning === true">
           		Por favor, escreva algo antes de comentar.

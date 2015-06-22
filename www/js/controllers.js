@@ -72,7 +72,9 @@ angular.module('starter.controllers', [])
   $scope.offlinePhotos = [];
   $scope.scroll = false;
   $scope.qtd = 0;
-  
+  $scope.emptyDays = null;
+  var emptySince = null;
+
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
     promiseList = [];
@@ -84,7 +86,7 @@ angular.module('starter.controllers', [])
     $scope.$digest();
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
-    if($scope.feed.length < 7){
+    if($scope.feed.length < 3){
       console.log("feed muito pequeno, carregando mais dados...");
       $scope.loadMore();
     }
@@ -143,6 +145,17 @@ angular.module('starter.controllers', [])
      } 
   }
 
+  function buildEmptyCycle(day){
+    if(!$scope.emptyDays){
+      $scope.emptyDays = "Sem coletas no dia " + day;
+      emptySince = day;
+    }
+    else{
+      $scope.emptyDays = "Sem coletas do dia " + emptySince + " até " + day;
+    }
+    
+  }
+
  function ConstructFeed(){
     console.log("ConstructFeed Call");
     $ionicLoading.show({
@@ -153,6 +166,7 @@ angular.module('starter.controllers', [])
       showDelay: 300
     });
 
+    
     $scope.feed = [];
     $scope.offlinePhotos = [];
 
@@ -185,15 +199,25 @@ angular.module('starter.controllers', [])
           $scope.scroll = true;
           var dayEntry = {
             photos: [],
-            label: day.toString("dd/MM") 
+            label: day.toString("dd/MM"),
+            cycle: false 
           }
           ImagensServices.recuperaImagemData(Date.today(), Date.today().add(1).day()).then(
               function onFulfilled(ajaxData){
                 console.log("AJAX promise fulfulled!");
                 prepareFeed(ajaxData).then(function(photos){
-                  dayEntry.photos = photos;
-                  $scope.feed.push(dayEntry);
-                  
+                  if(photos){
+                    dayEntry.photos = photos;
+                    if($scope.emptyDays){
+                      dayEntry.cycle = $scope.emptyDays;
+                      $scope.emptyDays = null;
+                    }
+                    $scope.feed.push(dayEntry);
+                  }
+                  else{
+                    console.log("Entrada vazia nesse dia...");
+                    buildEmptyCycle(dayEntry.label);
+                  }
                   console.log("Feed construido!");
                   $scope.$emit('todo:listAdded');
                 });
@@ -230,8 +254,17 @@ angular.module('starter.controllers', [])
         function onFulfilled(ajaxData){
           console.log("AJAX promise fulfulled!");
           prepareFeed(ajaxData).then(function(photos){
-             dayEntry.photos = photos;
-             $scope.feed.push(dayEntry);
+            if(photos){
+              dayEntry.photos = photos;
+              if($scope.emptyDays){
+                dayEntry.cycle = $scope.emptyDays;
+                $scope.emptyDays = null;
+              }
+              $scope.feed.push(dayEntry);
+            }
+            else{
+              buildEmptyCycle(dayEntry.label);
+            }
              console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
              $scope.$emit('todo:listAdded');
           });
@@ -402,6 +435,8 @@ angular.module('starter.controllers', [])
 
   }
 
+  $scope.commentable = true;
+
   $scope.comentar = function(){
     var commentText = $scope.commentField.text;
     console.log("Criando comentario> " + commentText +  " trim> " + commentText.trim());
@@ -438,6 +473,11 @@ angular.module('starter.controllers', [])
           $scope.photo = result;
           $scope.photo.url = 'data:image/png;base64,' + result.base64;
           var date = Date.parse(result.data);
+          var oneWeekAgo = new Date().last().week();
+          if (Date.compare(date, oneWeekAgo) == -1 ){
+            console.log("Foto muito antiga, desabilitar comentarios");
+            $scope.commentable = false;
+          }
           $scope.photo.stars = [];
           $scope.photo.starsEmpty = [];
           for(var j=1; j<= 5; j++){
