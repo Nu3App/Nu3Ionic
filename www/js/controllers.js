@@ -558,7 +558,7 @@ angular.module('starter.controllers', [])
   };
  
   $scope.register = function() {
-    if($scope.user.senha == $scope.user.senha2){
+    if($scope.user.senha == $scope.user.senha2 && $scope.user.nome != null && $scope.user.email != null){
       AuthenticationService.register($scope.user).then(
         function onFulfilled(result){
           console.log("Usuario criado: " + JSON.stringify(result));
@@ -577,7 +577,7 @@ angular.module('starter.controllers', [])
       );
     }
     else{
-      $scope.message = "As senhas diferem, por favor verifique e tente novamente."
+      $scope.message = "As senhas diferem ou há campos vazios, por favor verifique e tente novamente."
     } 
   };
 

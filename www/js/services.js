@@ -1,7 +1,5 @@
 var urlService = "http://nu3.unifesp.br/nutri-rest-patient/rest/"
-//"http://200.144.93.244/nutri-rest-patient/rest/";
-//login: "auth/loginUsuario"
-//cadastro: 
+//server test: http://200.144.92.167:8080/nu3
 
 angular.module('nu3.services', [])
 .service('UserService', function($rootScope, $ionicModal, $timeout) {
