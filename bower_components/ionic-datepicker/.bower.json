@@ -1,0 +1,41 @@
+{
+  "name": "ionic-datepicker",
+  "version": "0.1.3",
+  "authors": [
+    "rajeshwarpatlolla <rajeshwar.patlolla@gmail.com>"
+  ],
+  "description": "A date picker component for ionic framework applications",
+  "main": [
+    "./dist/templates.js",
+    "./dist/ionic-datepicker.js",
+    "./dist/style.css"
+  ],
+  "keywords": [
+    "ionic-datepicker",
+    "ionic",
+    "datepicker",
+    "datepicker for ionic",
+    "datepicker for ionic framework"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/rajeshwarpatlolla",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ionic": "~0.9.27"
+  },
+  "_release": "0.1.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.3",
+    "commit": "1be7dc12ea8b81b3160e1a5ec8dbd38fd78cf35d"
+  },
+  "_source": "git://github.com/rajeshwarpatlolla/ionic-datepicker.git",
+  "_target": "~0.1.3",
+  "_originalSource": "ionic-datepicker"
+}

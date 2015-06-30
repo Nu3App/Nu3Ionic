@@ -100,7 +100,7 @@ angular.module('starter.controllers', [])
   $rootScope.$on('network:changed', function() {
     console.log("Event: Network changed!");
     var type = $cordovaNetwork.getNetwork()
-    if(networkType != type){
+    if(networkType != type && $state.current.name=="app.photolists"){
       networkType = type;
       if($cordovaNetwork.isOnline()){
         $scope.online = true;
@@ -300,7 +300,7 @@ angular.module('starter.controllers', [])
             image['url'] = 'data:image/png;base64,' + image.base64;
             image['detail_url'] = "#";
             image['nome'] = image.title;
-            image['data'] = parsedDate.toString("dd/MM - hh:mm");
+            image['data'] = parsedDate.toString("dd/MM - HH:mm");
             console.log("Offline Image = " + JSON.stringify(image).substring(0,50) + " title = " + image.nome);
             offlineContent.photos.push(image);
           }
@@ -449,10 +449,10 @@ angular.module('starter.controllers', [])
       $scope.warning = null;
       ImagensServices.criaComentario($stateParams.id, commentText).then(
         function onSuccess(){
-          console.log("Comentario Salvo com Sucesso! " + new Date().toString("hh:mm"));
+          console.log("Comentario Salvo com Sucesso! " + new Date().toString("HH:mm"));
           $scope.commentField.text = "";
           var comment = {
-            'dataEnvio' : "Agora às " + new Date().toString("hh:mm"),
+            'dataEnvio' : "Agora às " + new Date().toString("HH:mm"),
             'nomeUsuario' : user.username,
             'texto': commentText
           }
@@ -489,7 +489,7 @@ angular.module('starter.controllers', [])
             else $scope.photo.starsEmpty.push(1);
           }
           $scope.photo.day = date.toString("dd/MM/yy");
-          $scope.photo.hour = date.toString("hh:mm");
+          $scope.photo.hour = date.toString("HH:mm");
           $scope.$digest();
         }
   )
@@ -558,27 +558,32 @@ angular.module('starter.controllers', [])
   };
  
   $scope.register = function() {
-    if($scope.user.senha == $scope.user.senha2 && $scope.user.nome != null && $scope.user.email != null){
-      AuthenticationService.register($scope.user).then(
-        function onFulfilled(result){
-          console.log("Usuario criado: " + JSON.stringify(result));
-         $scope.user.senha = null;
-         $scope.user.senha2 = null;
-         $scope.message = "Usuário criado com sucesso, por favor faça o login."
-         $scope.btnFlag = true;
-         $scope.$digest();
-        },
-        function onRejected(reason, status){
-          //do error handling
-          var error = "Falha ao cadastrar, tente novamente.";
-          $scope.message = error;
-          $scope.$digest();
-        }
-      );
+    if($scope.user.senha != null && $scope.user.senha2 != null && $scope.user.nome != null && $scope.user.email != null){
+      if($scope.user.senha == $scope.user.senha2){
+        AuthenticationService.register($scope.user).then(
+          function onFulfilled(result){
+            console.log("Usuario criado: " + JSON.stringify(result));
+           $scope.user.senha = null;
+           $scope.user.senha2 = null;
+           $scope.message = "Usuário criado com sucesso, por favor faça o login."
+           $scope.btnFlag = true;
+           $scope.$digest();
+          },
+          function onRejected(reason, status){
+            //do error handling
+            var error = "Falha ao cadastrar, tente novamente.";
+            $scope.message = error;
+            $scope.$digest();
+          }
+        );
+      }
+      else{
+        $scope.message = "As senhas diferem, por favor verifique e tente novamente."
+      }
     }
     else{
-      $scope.message = "As senhas diferem ou há campos vazios, por favor verifique e tente novamente."
-    } 
+      $scope.message = "Há campos vazios, por favor verifique se todos estão preenchidos e tente novamente."
+    }
   };
 
   /*$scope.$on('event:auth-loginRequired', function(e, rejection) {
@@ -588,6 +593,53 @@ angular.module('starter.controllers', [])
 })
 
 .controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService) {
+    $scope.loadedPicture = false;
+    var dia = null;
+    var hora = null;
+
+    $scope.selectDate = function(){
+      console.log("Select date call!");
+      var options = {
+        date: new Date(),
+        mode: 'date',
+        maxDate: new Date()
+      };
+
+      function onSuccess(date) {
+        //alert('Selected date: ' + date);
+        dia = date;
+        $scope.selectedDay = date.toString("dd/MM/yy");
+        $scope.$digest();
+      }
+
+      function onError(error) { // Android only
+        alert('Error: ' + error);
+      }
+      datePicker.show(options, onSuccess, onError);
+    }
+
+    $scope.selectHour = function(){
+      console.log("Select date call!");
+      var options = {
+        date: new Date(),
+        mode: 'time',
+        is24Hour: true,
+        minuteInterval: 5
+      };
+
+      function onSuccess(hour) {
+        //alert('Selected date: ' + hour);
+        hora = hour;
+        $scope.selectedHour = hour.toString("HH:mm");
+        $scope.$digest();
+      }
+
+      function onError(error) { // Android only
+        alert('Error: ' + error);
+      }
+      datePicker.show(options, onSuccess, onError);
+    }
+
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
         $scope.blankTitle = true;
@@ -626,6 +678,7 @@ angular.module('starter.controllers', [])
               console.log("EXIF: " + exifObject);
             });
           $scope.imgURI = imageData;
+          $scope.loadedPicture = true;
                 
             
         }, function(err) {
@@ -648,7 +701,7 @@ angular.module('starter.controllers', [])
  
         $cordovaCamera.getPicture(options).then(function(imageData) {
             //$scope.imgURI = "data:image/jpeg;base64," + imageData;
-           
+            $scope.loadedPicture = false;
             $scope.imgURI = imageData;
         }, function(err) {
             console.log("Erro de getPicture...");
@@ -666,8 +719,19 @@ angular.module('starter.controllers', [])
           'data': new Date().setTimeToNow(), 
           'rating': 0
          }
+         var timestamp = new Date().getTime();
+         if($scope.loadedPicture == true){
+            console.log("Foto foi carregada!" + $scope.selectedDay + " - " + $scope.selectedHour);
+            var when = dia;
+            when.setHours(hora.getHours());
+            when.setMinutes(hora.getMinutes());
+            console.log("Data final: " + when);
+            image.day = when.getTime();
+            image.data = when;
+            timestamp = when.getTime();
+         }
          if($cordovaNetwork.isOnline()){
-          ImagensServices.criaImagem(image.nome, base64, new Date().getTime()).then(
+          ImagensServices.criaImagem(image.nome, base64, timestamp).then(
             function onSuccess(id){
               console.log("Imagem criada no servidor com id: " + id);
               image.idImagem = id;
@@ -709,6 +773,8 @@ angular.module('starter.controllers', [])
   $scope.user = user;
   $scope.imgURI = null;
   $scope.perfilPhoto = null;
+
+  
 
   console.log("Usuario: " + JSON.stringify(user));
   if(user.token_date){

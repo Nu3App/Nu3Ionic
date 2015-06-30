@@ -446,7 +446,7 @@ angular.module('nu3.services', [])
           json['detail_url'] = "#/app/photolists/" + json["ID"];
         }
         json['timestamp'] = parsedDate.getTime();
-        json['hour'] = parsedDate.toString("hh:mm");
+        json['hour'] = parsedDate.toString("HH:mm");
         return json;
     },
 

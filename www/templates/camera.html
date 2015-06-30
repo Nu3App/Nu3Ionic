@@ -15,7 +15,7 @@
     </div>
     <div ng-hide="dbResult !== undefined" class="list no-padding">
       <label class="item item-input item-stacked-label">
-        <span class="input-label">Qual é a sua refeição?</span>
+        <span class="input-label">O que você está comendo?</span>
         <input type="text" ng-model="photoTitle" placeholder="Descreva seu prato rapidamente...">
       </label>
       <div class="button-bar no-padding">
@@ -28,11 +28,25 @@
           <i class="icon ion-folder"></i>
         </a>
       </div>
-      <label class="item item-input item-stacked-label" ng-show="when">
-        <span class="input-label">Quando essa refeição foi feita?</span>
-        <input type="datetime" ng-model="photoTime" placeholder="Selecione um dia e hora...">
-      </label>
-      <button class="button button-full button-energized icon-right ion-archive" ng-hide="imgURI === undefined" class="button" ng-click="savePicture()">Salvar</button>
+      <div class="" ng-show="loadedPicture">
+        <center><p>Quando essa refeição foi feita?</p></center>
+        <div class="button-bar no-padding">
+          <a class="button button-dark"  ng-click="selectDate()">
+            Selecione a data &nbsp;
+            <i class="icon ion-ios-calendar"></i>
+          </a>
+          <a class="button button-dark" class="button" ng-click="selectHour()">
+            Selecione a hora &nbsp;
+            <i class="icon ion-clock"></i>
+          </a>
+        </div>
+        <center><p> Dia: {{selectedDay}} - Hora: {{selectedHour}}</p></center>
+        
+      </div>
+      
+          
+      <button class="button button-full button-energized icon-right ion-archive" ng-hide="imgURI === undefined || loadedPicture === true" class="button" ng-click="savePicture()">Salvar</button>
+      <button class="button button-full button-energized icon-right ion-archive" ng-show="loadedPicture === true && selectedDay !== undefined && selectedHour !== undefined" class="button" ng-click="savePicture()">Salvar</button>
     </div>
     <div class="card" ng-show="blankTitle === true" class="error-message">
       <div class="item item-text-wrap">

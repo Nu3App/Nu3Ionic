@@ -228,6 +228,13 @@ module.exports = [
         "clobbers": [
             "Connection"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-datepicker/www/android/DatePicker.js",
+        "id": "cordova-plugin-datepicker.DatePicker",
+        "clobbers": [
+            "datePicker"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -243,7 +250,8 @@ module.exports.metadata =
     "org.apache.cordova.device": "0.3.0",
     "org.apache.cordova.file": "1.3.3",
     "org.apache.cordova.network-information": "0.2.15",
-    "cordova-plugin-crosswalk-webview": "1.2.0"
+    "cordova-plugin-crosswalk-webview": "1.2.0",
+    "cordova-plugin-datepicker": "0.8.2"
 }
 // BOTTOM OF METADATA
 });
