@@ -17,34 +17,12 @@
             "id": "com.ionic.keyboard"
         }
     },
-    "org.apache.cordova.camera": {
-        "source": {
-            "type": "registry",
-            "id": "org.apache.cordova.camera"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "com.brodysoft.sqliteStorage": {
         "source": {
             "type": "git",
             "url": "https://github.com/brodysoft/Cordova-SQLitePlugin.git",
             "subdir": "."
         }
-    },
-    "org.apache.cordova.network-information": {
-        "source": {
-            "type": "registry",
-            "id": "org.apache.cordova.network-information"
-        }
-    },
-    "cordova-plugin-whitelist": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-whitelist"
-        },
-        "is_top_level": true,
-        "variables": {}
     },
     "cordova-plugin-splashscreen": {
         "source": {
@@ -83,6 +61,30 @@
         "source": {
             "type": "registry",
             "id": "cordova-plugin-datepicker"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.network-information": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.network-information"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-whitelist"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.camera": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.camera"
         },
         "is_top_level": true,
         "variables": {}

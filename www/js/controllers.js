@@ -68,6 +68,7 @@ angular.module('starter.controllers', [])
 .controller('PhotolistsCtrl', function($scope,$rootScope,$state, $ionicLoading, $cordovaNetwork, DBService, FeedService, ImagensServices) {
   var day = Date.today();
   var promiseList = [];
+  var contador = 0;
   $scope.feed = [];
   $scope.offlinePhotos = [];
   $scope.scroll = false;
@@ -87,8 +88,9 @@ angular.module('starter.controllers', [])
     $scope.$digest();
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
-    if($scope.feed.length < 3){
+    if($scope.feed.length < 2 && contador < 31){
       console.log("feed muito pequeno, carregando mais dados...");
+      contador += 1;
       $scope.loadMore();
     }
     else{
@@ -579,10 +581,12 @@ angular.module('starter.controllers', [])
       }
       else{
         $scope.message = "As senhas diferem, por favor verifique e tente novamente."
+        $scope.$digest();
       }
     }
     else{
       $scope.message = "Há campos vazios, por favor verifique se todos estão preenchidos e tente novamente."
+      $scope.$digest();
     }
   };
 
@@ -594,8 +598,12 @@ angular.module('starter.controllers', [])
 
 .controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService) {
     $scope.loadedPicture = false;
+    $scope.selectedDay = null;
+    $scope.selectedHour = null;
+    $scope.checkedSave = false;
     var dia = null;
     var hora = null;
+    var flag = true;
 
     $scope.selectDate = function(){
       console.log("Select date call!");
@@ -613,6 +621,7 @@ angular.module('starter.controllers', [])
       }
 
       function onError(error) { // Android only
+        $scope.selectedDay = null;
         alert('Error: ' + error);
       }
       datePicker.show(options, onSuccess, onError);
@@ -635,6 +644,7 @@ angular.module('starter.controllers', [])
       }
 
       function onError(error) { // Android only
+        $scope.selectedHour = null;
         alert('Error: ' + error);
       }
       datePicker.show(options, onSuccess, onError);
@@ -643,12 +653,17 @@ angular.module('starter.controllers', [])
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
         $scope.blankTitle = true;
+        $scope.savingPicture = false;
       }
       else{
-        $scope.blankTitle = false;
-        var imgURI = $scope.imgURI;
-        console.log("Img URI: " + imgURI);
-        getBase64FromImageUrl(imgURI); 
+        if(flag == true){
+          $scope.blankTitle = false;
+          $scope.savingPicture = true;
+          flag = false;
+          var imgURI = $scope.imgURI;
+          //console.log("Img URI: " + imgURI);
+          buildImageData(imgURI); 
+        }
       }
       
     }
@@ -665,10 +680,10 @@ angular.module('starter.controllers', [])
             sourceType : Camera.PictureSourceType.PHOTOLIBRARY, 
             allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 300,
-            targetHeight: 300,
+            targetWidth: 600,
+            targetHeight: 600,
             //popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
+            saveToPhotoAlbum: $scope.checkedSave
         }; 
         
         $cordovaCamera.getPicture(options).then(function(imageData) {
@@ -687,16 +702,17 @@ angular.module('starter.controllers', [])
     }
 
     $scope.takePicture = function() {
+        console.log("Salvar no album? " + $scope.checkedSave);
         var options = { 
             quality : 90, 
             destinationType : Camera.DestinationType.IMAGE_URI, 
             sourceType : Camera.PictureSourceType.CAMERA, 
             allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 300,
-            targetHeight: 300,
+            targetWidth: 600,
+            targetHeight: 600,
             popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
+            saveToPhotoAlbum: $scope.checkedSave
         };
  
         $cordovaCamera.getPicture(options).then(function(imageData) {
@@ -708,7 +724,24 @@ angular.module('starter.controllers', [])
         });
     }
 
-    function getBase64FromImageUrl(URL) {
+    function addPhotoToDatabase(image, base64, online){
+      DBService.addPhoto(image, base64, online).then(
+        function onSuccess(){
+            flag = true;
+            online ? $scope.dbResult = "Imagem salva e sincronizada com sucesso!" : $scope.dbResult = "Imagem salva localmente com sucesso!";
+            $scope.$digest();
+            
+        },
+        function onError(){
+            flag = true;
+            $scope.dbResult = "Falha, tente novamente";
+            $scope.$digest();
+        }
+      );
+    }
+
+    function buildImageData(URL) {
+      //get the base64 from the image url/uri
       CameraService.encodeImageUri(URL, function(base64){
          var id = Date.now();
          var image = {
@@ -735,17 +768,7 @@ angular.module('starter.controllers', [])
             function onSuccess(id){
               console.log("Imagem criada no servidor com id: " + id);
               image.idImagem = id;
-              DBService.addPhoto(image, base64, 1).then(
-                function onSuccess(){
-                    $scope.dbResult = "Imagem salva e sincronizada com sucesso!";
-                    $scope.$digest();
-                    
-                },
-                function onError(){
-                    $scope.dbResult = "Falha, tente novamente";
-                    $scope.$digest();
-                }
-              );
+              addPhotoToDatabase(image, base64, 1);
             },
             function onError(err){
               console.log("Erro no AJAX de criar foto: " + JSON.stringify(err));
@@ -753,16 +776,7 @@ angular.module('starter.controllers', [])
           );
         }
         else{
-          DBService.addPhoto(image, base64, 0).then(
-                function onSuccess(){
-                    $scope.dbResult = "Imagem salva localmente com sucesso!";
-                    $scope.$digest();
-                },
-                function onError(){
-                    $scope.dbResult = "Falha, tente novamente";
-                    $scope.$digest();
-                }
-              );
+          addPhotoToDatabase(image, base64, 0);
         }
       });
     }
@@ -787,7 +801,6 @@ angular.module('starter.controllers', [])
   }
   DBService.getPerfil(user.ID).then(
     function onSucess(data){
-      console.log("perfil carregado!");
       if(data.perfil != null){
         console.log("Perfil carregado: " + JSON.stringify(data.perfil));
         $scope.perfilPhoto = "data:image/jpeg;base64," + data.perfil;

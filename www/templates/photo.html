@@ -1,4 +1,4 @@
-<ion-view view-title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Refeição </span>">
+<ion-view view-title="<a navClear href='#/app/playlists'><img src='img/nu3_icon.png' height='40px' width='40px'></a><span class='energized-text header-title'> Refeição </span>">
   <ion-content>
   	<div ng-show="photo === undefined">
 		<center>
@@ -14,8 +14,8 @@
 		    <p class="prettyline no-padding"></p>
 		    <div class = "row">
 		    	<div class="col col-33">
-					<i ng-repeat="star in photo.stars track by $index" class="ion-ios-star"></i>
-		        	<i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline"></i>
+					<i ng-repeat="star in photo.stars track by $index" class="ion-ios-star energized"></i>
+		        	<i ng-repeat="empty in photo.starsEmpty track by $index" class="ion-ios-star-outline energized"></i>
 		    	</div>
 		    	<div class="col col-67">
 		    		<label><i class="ion-android-calendar"></i> &nbsp;{{photo.day}} &nbsp;<i class="ion-android-time"></i>&nbsp; {{photo.hour}} &nbsp;</label>
