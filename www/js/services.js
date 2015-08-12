@@ -152,7 +152,7 @@ angular.module('nu3.services', [])
         self.db = $cordovaSQLite.openDB("my.db"); 
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS users (ID TEXT PRIMARY KEY, nomeUsuario TEXT, email TEXT, token TEXT, token_date DATETIME)");
         $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS perfils (ID TEXT PRIMARY KEY, perfil TEXT)");
-        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, data TEXT, day_timestamp INTEGER, last_comment TEXT, last_comment_id TEXT, rating INTEGER, synchronized INTEGER)");
+        $cordovaSQLite.execute(self.db, "CREATE TABLE IF NOT EXISTS photos (ID TEXT PRIMARY KEY, title TEXT, base64 TEXT, timestamp INTEGER, last_comment TEXT, last_comment_id TEXT, rating INTEGER, synchronized INTEGER)");
         def.resolve(true);
       }catch(e){
         def.reject(e);
@@ -311,11 +311,11 @@ angular.module('nu3.services', [])
     return deferred.promise;
   },
 
-  self.addPhoto = function(json, base64, mode){
-    console.log("DB: Adding photo with id " + json.idImagem + " do dia: " + json.day);
+  self.addPhoto = function(json, mode){
+    console.log("DB: Adding photo with id " + json.idImagem + " do dia: " + json.timestamp);
     var deferred = Q.defer();
-    var query = "INSERT INTO photos(ID, title, base64, data, day_timestamp, rating, synchronized) VALUES (?,?,?,?,?,?,?)";
-    $cordovaSQLite.execute(self.db, query, [json.idImagem, json.nome, base64, json.data, json.day, json.rating, mode]).then(function(res) {
+    var query = "INSERT INTO photos(ID, title, base64, timestamp, rating, synchronized) VALUES (?,?,?,?,?,?)";
+    $cordovaSQLite.execute(self.db, query, [json.idImagem, json.nome, json.base64, json.timestamp, json.rating, mode]).then(function(res) {
         //console.log("Photo " + json.idImagem + " adicionado no banco de dados com sucesso!");
         deferred.resolve(true);
     }, function (err) {
@@ -483,7 +483,7 @@ angular.module('nu3.services', [])
                   if (base != null){
                     //console.log("Teste base: " + base.slice(0,10) + ".....");
                     json["base64"] = base;
-                    DBService.addPhoto(json, base, 1).then(
+                    DBService.addPhoto(json, 1).then(
                       function(){
                         console.log("Base da imagem" + json.idImagem + "adicionada no banco de dados...");
                         DBService.updateComment(json.idImagem, json.ultimoComentario);

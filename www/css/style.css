@@ -22,7 +22,8 @@
 }
 
 .energized-text{
-	color: #ffc900 !important;
+	color: #008a56 !important;
+/* #ffc900 !important; */
 }
 
 .header-title{
@@ -79,6 +80,15 @@
 	padding: 0px;
 }
 
+.img-logo-unimed{
+	width: 250px;
+	height: 100px;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	padding: 0px;
+}
+
 .menu-logo{
 	width: 100px;
 	height: 100px;
@@ -129,11 +139,15 @@
 	color: black;
 }
 
+.white {
+	color: white;
+}
+
 .prettyline {
   margin: 25px 0;
   height: 1px;
-  background: #FFBD21;
-  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #FFBD21));
+  background: #008a56; /*#FFBD21;*/
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #008a56));
   
 }
 
@@ -202,7 +216,8 @@ div.footer-button a.button.button-full {
 	}
 
 .bubble2{
-    background-color: #ffc900;
+    background-color: #008a56;/*#ffc900;*/
+    color: white;
     border-radius: 5px;
     box-shadow: 0 0 6px #B2B2B2;
     display: inline-block;
@@ -218,7 +233,7 @@ div.footer-button a.button.button-full {
 .bubble2::before {
 
 float:right;
-    background-color: #ffc900;
+    background-color: #008a56; /*#ffc900;*/
     content: "\00a0";
     display: block;
     height: 19px;
@@ -239,7 +254,7 @@ float:right;
 .bubble2{
 		float: right;
 		width: 80%;
-		background-color: #ffc900;
+		background-color: #008a56; /*#ffc900;*/
 		border-radius: 5px;
 		box-shadow: 0 0 6px #B2B2B2;
 		display: inline-block;

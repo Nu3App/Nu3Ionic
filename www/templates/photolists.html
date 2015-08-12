@@ -1,4 +1,4 @@
-<ion-view view-title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Home </span>">
+<ion-view view-title="<img src='img/unimed_header.jpg' height='40px' width='40px'><span class='header-title'> Home </span>">
   <ion-content class="has-tabs">
     <!--<label class="pull-right">{{network}}</label>-->
     <div class="card" ng-show="offlineFeed">
@@ -36,9 +36,9 @@
       </ion-item>
     </ion-list>
     <ion-list>
-      <ion-item ng-repeat="day in feed" class="item item-divider item-energized feed-divider">
+      <ion-item ng-repeat="day in feed" class="item item-divider item-dark feed-divider">
         <div id="dayCycle" ng-show="day.cycle">
-          <h3 class="black"><center>Período sem coletas!</center></h3>
+          <h3 class="white"><center>Período sem coletas!</center></h3>
           <div class="">
             <div class="item item-text-wrap" ng-style="{'padding-top': '2px !important', 'padding-bottom': '2px !important'}">
               <center>{{day.cycle}}</center>
@@ -46,7 +46,7 @@
           </div>
         </div>
         <div id="dayEntry" ng-style="{'padding-top': '2px'}">
-          <h3 class="black"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
+          <h3 class="white"><center>Coletas do dia: <strong>{{day.label}}</strong></center></h3>
           <div class="card feed-card" ng-show="!day.photos">
             <div class="item item-text-wrap">
               <center>Sem coletas nesse dia...</center>
@@ -116,7 +116,7 @@
   </ion-footer-bar>
   -->
   </ion-content>
-  <div class="tabs-striped tabs-background-dark tabs-color-energized">
+  <div class="tabs-striped tabs-background-balanced tabs-color-light">
     <div class="tabs">
         <a class="tab-item disable-user-behavior active" ui-sref="#">
           <i class="icon ion-home"></i>Home

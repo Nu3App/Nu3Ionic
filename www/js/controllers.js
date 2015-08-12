@@ -309,7 +309,7 @@ angular.module('starter.controllers', [])
           for (var i = result.length - 1; i>=0; i--){
             //console.log(i + " -> " + JSON.stringify(result.item(i)));
             var image = result.item(i);
-            var parsedDate = Date.parse(image.data);
+            var parsedDate = new Date(image.timestamp);
             image['url'] = 'data:image/png;base64,' + image.base64;
             image['detail_url'] = "#";
             image['nome'] = image.title;
@@ -380,7 +380,7 @@ angular.module('starter.controllers', [])
   function sendAndUpdate(image, index){
     console.log("Image " + index + " -> " + image.title);
     $scope.offlinePhotos[index].synch = "Sincronizando...";
-    ImagensServices.criaImagem(image.title, image.base64, image.ID).then(
+    ImagensServices.criaImagem(image.title, image.base64, image.timestamp).then(
       function onFulfilled(result){
         console.log("criaImagem Fulfilled = " + image.title)
         DBService.updatePhoto(image.ID, result).then(
@@ -492,9 +492,9 @@ angular.module('starter.controllers', [])
           $ionicLoading.hide();
           $scope.photo = result;
           $scope.photo.url = 'data:image/png;base64,' + result.base64;
-          var date = Date.parse(result.data);
-          var oneWeekAgo = new Date().last().week();
-          if (Date.compare(date, oneWeekAgo) == -1 ){
+          var oneWeekAgo = new Date().last().week().getTime();
+          console.log("One Week Ago: " + oneWeekAgo + " Date time: " + result.timestamp);
+          if (result.timestamp < oneWeekAgo){
             console.log("Foto muito antiga, desabilitar comentarios");
             $scope.commentable = false;
           }
@@ -504,15 +504,15 @@ angular.module('starter.controllers', [])
             if(j <= result.rating) $scope.photo.stars.push(1);
             else $scope.photo.starsEmpty.push(1);
           }
-          $scope.photo.day = date.toString("dd/MM/yy");
-          $scope.photo.hour = date.toString("HH:mm");
+          $scope.photo.day = new Date(result.timestamp).toString("dd/MM/yy");
+          $scope.photo.hour = new Date(result.timestamp).toString("HH:mm");
           $scope.$digest();
         }
   )
 
   ImagensServices.recuperaComentarios($stateParams.id).then(
     function(comentarios){
-      console.log("me = " + user.nomeUsuario);
+      console.log("Comentarios: " + JSON.stringify(comentarios));
       $scope.me = user.nomeUsuario;
       $scope.comentarios = comentarios;
       $scope.digest();
@@ -738,8 +738,8 @@ angular.module('starter.controllers', [])
         });
     }
 
-    function addPhotoToDatabase(image, base64, online){
-      DBService.addPhoto(image, base64, online).then(
+    function addPhotoToDatabase(image, online){
+      DBService.addPhoto(image, online).then(
         function onSuccess(){
             flag = true;
             online ? $scope.dbResult = "Imagem salva e sincronizada com sucesso!" : $scope.dbResult = "Imagem salva localmente com sucesso!";
@@ -762,27 +762,29 @@ angular.module('starter.controllers', [])
           'idImagem': id, 
           'nome': $scope.photoTitle, 
           'base64': base64,
-          'day': Date.today().getTime(),
-          'data': new Date().setTimeToNow(), 
+          'timestamp': Date.now(),
+          //'day': Date.today().getTime(),
+          //'data': new Date().setTimeToNow(), 
           'rating': 0
          }
-         var timestamp = new Date().getTime();
+         //var timestamp = new Date().getTime();
          if($scope.loadedPicture == true){
             console.log("Foto foi carregada!" + $scope.selectedDay + " - " + $scope.selectedHour);
             var when = dia;
-            when.setHours(hora.getHours());
-            when.setMinutes(hora.getMinutes());
-            console.log("Data final: " + when);
-            image.day = when.getTime();
+            dia.setHours(hora.getHours());
+            dia.setMinutes(hora.getMinutes());
+            console.log("Data final: " + dia);
+            image.timestamp = dia.getTime();
+            /*image.day = when.getTime();
             image.data = when;
-            timestamp = when.getTime();
+            timestamp = when.getTime();*/
          }
          if($cordovaNetwork.isOnline()){
-          ImagensServices.criaImagem(image.nome, base64, timestamp).then(
+          ImagensServices.criaImagem(image.nome, image.base64, image.timestamp).then(
             function onSuccess(id){
               console.log("Imagem criada no servidor com id: " + id);
               image.idImagem = id;
-              addPhotoToDatabase(image, base64, 1);
+              addPhotoToDatabase(image, 1);
             },
             function onError(err){
               console.log("Erro no AJAX de criar foto: " + JSON.stringify(err));
@@ -790,7 +792,7 @@ angular.module('starter.controllers', [])
           );
         }
         else{
-          addPhotoToDatabase(image, base64, 0);
+          addPhotoToDatabase(image, 0);
         }
       });
     }
