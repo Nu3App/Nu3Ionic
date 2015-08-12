@@ -436,6 +436,7 @@ angular.module('nu3.services', [])
           if(j <= json.rating) json["stars"].push(1);
           else json["starsEmpty"].push(1);
         }
+        console.log("DEBUG buildPhotoJson: " + JSON.stringify(json));
         var parsedDate = Date.parse(json.data);
         if(json.idImagem){
           console.log("Building photo with idImagem: " + json.idImagem);

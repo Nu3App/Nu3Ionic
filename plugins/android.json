@@ -22,7 +22,8 @@
                             "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
                             "count": 1
                         }
-                    ]
+                    ],
+                    "/manifest": []
                 }
             },
             "res/xml/config.xml": {
@@ -41,10 +42,6 @@
                             "count": 1
                         },
                         {
-                            "xml": "<preference name=\"webView\" value=\"org.crosswalk.engine.XWalkWebViewEngine\" />",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
                             "count": 1
                         },
@@ -54,6 +51,18 @@
                         },
                         {
                             "xml": "<feature name=\"Camera\"><param name=\"android-package\" value=\"org.apache.cordova.camera.CameraLauncher\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"File\"><param name=\"android-package\" value=\"org.apache.cordova.file.FileUtils\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<preference name=\"webView\" value=\"org.crosswalk.engine.XWalkWebViewEngine\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -71,9 +80,6 @@
         "com.plugin.datepicker": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
-        "cordova-plugin-crosswalk-webview": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
         "org.apache.cordova.network-information": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
@@ -81,6 +87,15 @@
             "PACKAGE_NAME": "br.example.avestruz"
         },
         "org.apache.cordova.camera": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "org.apache.cordova.file": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "cordova-plugin-crosswalk-webview": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "br.example.avestruz"
         }
     },

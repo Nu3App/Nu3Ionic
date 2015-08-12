@@ -20,7 +20,9 @@
     "com.ionic.keyboard",
     "org.apache.cordova.network-information",
     "cordova-plugin-whitelist",
-    "org.apache.cordova.camera"
+    "org.apache.cordova.camera",
+    "org.apache.cordova.file",
+    "cordova-plugin-crosswalk-webview"
   ],
   "cordovaPlatforms": []
 }

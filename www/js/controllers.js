@@ -37,16 +37,22 @@ angular.module('starter.controllers', [])
   DBService.status().then(function(){
     console.log("Promessa do banco de dados cumprida...");
     //UserService.init();
+    var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+    console.log("userInfo = " + JSON.stringify(userInfo));
+    $ionicLoading.hide();
+    if (userInfo.hasOwnProperty('idUsuario')){
+      user = userInfo;
+      var today = Date.today();
+      console.log("teste de tempo: " + Date.parse(user.dataExpiracao).getTime() + '>' + today.getTime());
+    }
+    else{
+      console.log("Usuário Nulo ou Token Expirado");
+      $state.go('login');
+    }
+    /*
     DBService.loadUser().then(function(userResult){
         console.log("User promise fulfilled!");
         $ionicLoading.hide();
-        /*if($cordovaNetwork.isOnline()){
-          $scope.network = 'Online';
-        }
-        else{
-          $scope.network = 'Offline';
-        } 
-        */
         if(userResult != null){
           user = userResult;
           $rootScope.token = user.token;
@@ -59,6 +65,7 @@ angular.module('starter.controllers', [])
         }
         
     });
+    */
   });
  
   
@@ -76,6 +83,12 @@ angular.module('starter.controllers', [])
   $scope.emptyDays = null;
 
   var emptySince = null;
+  var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+  if (userInfo.hasOwnProperty('idUsuario')){
+    user = userInfo;
+    $scope.me = user.nomeUsuario;
+    ConstructFeed();
+  }
 
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
@@ -132,11 +145,7 @@ angular.module('starter.controllers', [])
       else return false;
     }
 
-  DBService.getUser().then(function(userResult){
-    console.log("Usuario carregado: " + JSON.stringify(userResult));
-    $scope.me = userResult.nomeUsuario;
-    ConstructFeed();
-  });
+    
 
   var sort_by = function(field, reverse, primer){
    var key = primer ? 
@@ -206,7 +215,9 @@ angular.module('starter.controllers', [])
             label: day.toString("dd/MM"),
             cycle: false 
           }
-          ImagensServices.recuperaImagemData(Date.today(), Date.today().add(1).day()).then(
+          var time = {hour:00, minute:01};
+          var timeEnd = {hour:23, minute:59}
+          ImagensServices.recuperaImagemData(Date.today().at(time), Date.today().at(timeEnd)).then(
               function onFulfilled(ajaxData){
                 console.log("AJAX promise fulfulled!");
                 prepareFeed(ajaxData).then(function(photos){
@@ -327,7 +338,10 @@ angular.module('starter.controllers', [])
     if(imagensData && imagensData.length > 0){
       var imagePromises = []; //Array de promeças para cada imagem carregada no loop
       for (var i = imagensData.length - 1; i>=0; i--){
-        console.log("DEBUG: Getting index " + i + " data...");
+        console.log("DEBUG: Getting index " + i + " data..." + JSON.stringify(imagensData[i]).substring(0,100));
+        if(i == 0){
+          console.log("TESTEEE ===> " + JSON.stringify(imagensData[i]));
+        }
         //idImagem , nome, data, rating, descricao, ultimoComentario (idComentario, nomeUsuario, texto, dataEnvio)
         var json = FeedService.buildPhotoJson(imagensData[i]);
         console.log("DEBUG: Pre-json builded!");
@@ -455,7 +469,7 @@ angular.module('starter.controllers', [])
           $scope.commentField.text = "";
           var comment = {
             'dataEnvio' : "Agora às " + new Date().toString("HH:mm"),
-            'nomeUsuario' : user.username,
+            'nomeUsuario' : user.nomeUsuario,
             'texto': commentText
           }
           $scope.comentarios.push(comment);
@@ -522,12 +536,12 @@ angular.module('starter.controllers', [])
           result.email = $scope.user.email;
           user = result;
          $scope.user.senha = null;
-         
-         DBService.insertUser(result).then(function(){
-            console.log("Dados do usuário inseridos no banco de dados...");
+         window.localStorage['user'] = JSON.stringify(result);
+         //DBService.insertUser(result).then(function(){
+            console.log("Dados do usuário inseridos no banco de dados..." + JSON.stringify(result));
             $scope.$emit('todo:listChanged');
             $state.go('app.photolists');
-         });
+         //});
         },
         function onRejected(reason, status){
           //do error handling
@@ -791,15 +805,10 @@ angular.module('starter.controllers', [])
   
 
   console.log("Usuario: " + JSON.stringify(user));
-  if(user.token_date){
-    $scope.user.tokenExp = Date.parse(user.token_date).toString("dd/MM");
+  if(user.dataExpiracao){
+    $scope.user.tokenExp = Date.parse(user.dataExpiracao).toString("dd/MM");
   }
-  else{
-    if(user.dataExpiracao){
-      $scope.user.tokenExp = Date.parse(user.dataExpiracao).toString("dd/MM");
-    }
-  }
-  DBService.getPerfil(user.ID).then(
+  DBService.getPerfil(user.idUsuario).then(
     function onSucess(data){
       if(data.perfil != null){
         console.log("Perfil carregado: " + JSON.stringify(data.perfil));
@@ -817,7 +826,7 @@ angular.module('starter.controllers', [])
     CameraService.encodeImageUri(imgURI, function(base64){ 
       //chama webservice
       //salva no banco de dados
-      DBService.addPerfil(user.ID, base64).then(
+      DBService.addPerfil(user.idUsuario, base64).then(
         function onSucess(){
           $scope.perfilPhoto = "data:image/jpeg;base64," + base64;
           $scope.imgURI = null;
@@ -929,4 +938,33 @@ angular.module('starter.controllers', [])
 
 
 })
+
+.controller("NotificationCtrl", function($scope, $cordovaLocalNotification) {
+ 
+    $scope.add = function() {
+        var alarmTime = new Date();
+        alarmTime.setMinutes(alarmTime.getMinutes() + 1);
+        $cordovaLocalNotification.add({
+            id: "1234",
+            date: alarmTime,
+            message: "This is a message",
+            title: "This is a title",
+            autoCancel: true,
+            sound: null
+        }).then(function () {
+            console.log("The notification has been set");
+        });
+    };
+ 
+    $scope.isScheduled = function() {
+        $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+            alert("Notification 1234 Scheduled: " + isScheduled);
+        });
+    }
+
+    $scope.$on("$cordovaLocalNotification:added", function(id, state, json) {
+      alert("Added a notification");
+    });
+ 
+});
 

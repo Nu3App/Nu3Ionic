@@ -11,14 +11,25 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
 
 .run(function($ionicPlatform, $state, DBService, $cordovaNetwork, $rootScope) {
   $ionicPlatform.ready(function() {
+    /*if(device.platform === "iOS") {
+        window.plugin.notification.local.promptForPermission();
+    }
+    //configure notification listener
+    window.plugin.notification.local.onadd = function (id, state, json) {
+      var notification = {
+          id: id,
+          state: state,
+          json: json
+      };
+      $timeout(function() {
+          $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
+      });
+    };
+    */
     networkType = $cordovaNetwork.getNetwork()
 
     var isOnline = $cordovaNetwork.isOnline()
-
     var isOffline = $cordovaNetwork.isOffline()
-
-
-    
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -28,6 +39,7 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    
     //db = $cordovaSQLite.openDB("my.db");
     DBService.init()
   });
@@ -105,6 +117,17 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       }
     }
   })
+/*
+  .state('app.notification', {
+    url: "/notification",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/notification.html",
+        controller: 'NotificationCtrl'
+      }
+    }
+  })
+*/
     .state('app.photolists', {
       url: "/photolists",
       views: {
