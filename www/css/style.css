@@ -8,7 +8,7 @@
 	position:relative;
 }
 .has-botton {
-	padding-bottom:100px;   /* Height of the footer element */
+	padding-bottom:70px;   /* Height of the footer element */
 }
 .botton {
 	width:100%;
@@ -24,6 +24,10 @@
 .energized-text{
 	color: #008a56 !important;
 /* #ffc900 !important; */
+}
+
+.forgot-text{
+	margin: -5px 5px -5px 5px !important;
 }
 
 .header-title{
@@ -149,6 +153,13 @@
   background: #008a56; /*#FFBD21;*/
   background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #008a56));
   
+}
+
+.prettyline-text-right {
+  margin: 25px 0;
+  height: 1px;
+  background: #008a56; /*#FFBD21;*/
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(#008a56), color-stop(50%, #008a56));
 }
 
 div.footer-button a.button.button-full {

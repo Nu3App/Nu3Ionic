@@ -34,10 +34,6 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Keyboard\"><param name=\"android-package\" value=\"com.ionic.keyboard.IonicKeyboard\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"DatePickerPlugin\"><param name=\"android-package\" value=\"com.plugin.datepicker.DatePickerPlugin\" /></feature>",
                             "count": 1
                         },
@@ -64,6 +60,14 @@
                         {
                             "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Keyboard\"><param name=\"android-package\" value=\"com.ionic.keyboard.IonicKeyboard\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -72,9 +76,6 @@
     },
     "installed_plugins": {
         "com.brodysoft.sqliteStorage": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
-        "com.ionic.keyboard": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
         "com.plugin.datepicker": {
@@ -96,6 +97,12 @@
             "PACKAGE_NAME": "br.example.avestruz"
         },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "com.ionic.keyboard": {
             "PACKAGE_NAME": "br.example.avestruz"
         }
     },

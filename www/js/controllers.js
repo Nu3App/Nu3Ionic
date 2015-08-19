@@ -610,6 +610,23 @@ angular.module('starter.controllers', [])
   });*/  
 })
 
+.controller('ForgotCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+  $scope.message = "";
+  
+  $scope.user = {
+    currentPW: null,
+    newPW: null,
+    newPWC: null
+  };
+ 
+  $scope.sendMail = function() { 
+  };
+
+  $scope.resetPassword = function() { 
+  };
+
+  
+})
 .controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService) {
     $scope.loadedPicture = false;
     $scope.selectedDay = null;
