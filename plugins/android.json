@@ -64,6 +64,10 @@
                         {
                             "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -96,6 +100,9 @@
             "PACKAGE_NAME": "br.example.avestruz"
         },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "br.example.avestruz"
         }
     },
