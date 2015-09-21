@@ -84,11 +84,15 @@ angular.module('starter.controllers', [])
 
   var emptySince = null;
   var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+
+
   if (userInfo.hasOwnProperty('idUsuario')){
     user = userInfo;
     $scope.me = user.nomeUsuario;
     ConstructFeed();
   }
+
+  
 
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
@@ -170,14 +174,17 @@ angular.module('starter.controllers', [])
   }
 
  function ConstructFeed(){
-    console.log("ConstructFeed Call");
-    $ionicLoading.show({
-      content: 'Loading Data',
-      animation: 'fade-in',
-      showBackdrop: false,
-      maxWidth: 200,
-      showDelay: 300
-    });
+  console.log("ConstructFeed Call");
+  $ionicLoading.show({
+    content: 'Loading Data',
+    animation: 'fade-in',
+    showBackdrop: false,
+    maxWidth: 200,
+    showDelay: 300
+  });
+
+    //HANDSHAKE:
+  
 
     
     $scope.feed = [];
@@ -438,6 +445,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PhotoCtrl', function($scope, $stateParams, DBService, $ionicLoading, ImagensServices) {
+  //Status: Funcionando como esperado
   console.log("detalhes: " + JSON.stringify($stateParams));
   $ionicLoading.show({
       content: 'Carregando Detalhes',
@@ -522,6 +530,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+  //Status: Funcionando como esperado, esperando implementação de webservice adicional de associação de nutricionista
   $scope.message = "";
   
   $scope.user = {
@@ -537,10 +546,26 @@ angular.module('starter.controllers', [])
           user = result;
          $scope.user.senha = null;
          window.localStorage['user'] = JSON.stringify(result);
+         //Handshake = Se o webservice voltar os dados da nutri pelo mesmo result fazer a verificação agora:
+         /*
+          if(result.hasOwnProperty('idNutri'));
+          //senão chamar webservice de associação e inserir dentro do json result que ficara guardado no localStorage
+         */
          //DBService.insertUser(result).then(function(){
-            console.log("Dados do usuário inseridos no banco de dados..." + JSON.stringify(result));
-            $scope.$emit('todo:listChanged');
-            $state.go('app.photolists');
+          console.log("Dados do usuário inseridos no banco de dados..." + JSON.stringify(result));
+            
+          console.log("Checando o HANDSHAKE...");
+            if (result.hasOwnProperty('idNutri')){
+              console.log("Warning: Existe associação com uma nutricionista");
+              $scope.$emit('todo:listChanged');
+              $state.go('app.photolists');
+            }
+            else{
+              console.log("Warning: Não existe associação com uma nutricionista");
+              $state.go('invite');
+            }
+           
+            
          //});
         },
         function onRejected(reason, status){
@@ -557,6 +582,13 @@ angular.module('starter.controllers', [])
       );
   };
 
+  $scope.goHome = function(){
+    console.log("GoHome trigger l");
+    $scope.$emit('todo:listChanged');
+    $state.go('app.photolists');
+
+  }
+
   /*$scope.$on('event:auth-loginRequired', function(e, rejection) {
     console.log('handling login required');
     $scope.loginModal.show();
@@ -564,6 +596,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('RegisterCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+  //Status: Funcionando como esperado
   $scope.message = "";
   
   $scope.user = {
@@ -611,6 +644,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ForgotCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+  //Status: Esperando implementação dos webservices na parte servidora.
   $scope.message = "";
   
   $scope.user = {
@@ -959,7 +993,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller("NotificationCtrl", function($scope, $cordovaLocalNotification) {
- 
+ //Não funciona como esperado, estudar solução alternativa
     $scope.add = function() {
         var alarmTime = new Date();
         alarmTime.setMinutes(alarmTime.getMinutes() + 1);
@@ -985,5 +1019,38 @@ angular.module('starter.controllers', [])
       alert("Added a notification");
     });
  
-});
+})
 
+.controller("InviteCtrl", function($scope, $state) {
+ //Status: Em desenvolvimento
+  var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+  $scope.nutri = {
+    name: 'Fulana',
+    email: null
+  }
+
+  $scope.forget = {
+    text: "Não mostrar mais essa mensagem",
+    checked: false
+  };
+
+  $scope.saveRemember = function(){
+    userInfo.rememberNutri = !$scope.forget.checked;
+    console.log("Salvando o lembre-me: " +  !$scope.forget.checked);
+    window.localStorage['user'] = JSON.stringify(userInfo);
+  }
+
+  $scope.goHome = function(){
+    console.log("GoHome trigger 1");
+    $scope.$emit('todo:listChanged');
+    $state.go('app.photolists');
+
+  }
+
+
+
+  $scope.invite = function() {
+    //chamada de webservice para geração de email
+    console.log("Invite Trigger");
+  };
+});

@@ -80,6 +80,11 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       templateUrl: "templates/register.html"
   })
 
+  .state('invite', {
+    url: "/invite",
+    templateUrl: "templates/invite.html",
+  })
+
   .state('forgot', {
       url: "/forgot",
       //animation: 'slide-in-up',
@@ -123,6 +128,8 @@ var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordo
       }
     }
   })
+
+  
 /*
   .state('app.notification', {
     url: "/notification",

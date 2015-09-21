@@ -1,0 +1,50 @@
+<ion-modal-view ng-controller="InviteCtrl">
+  <ion-header-bar class="bar-balanced">
+    <h1 class="title white">Convidar</h1>
+    <!--<div class="buttons">
+      <a href="#/app/playlists" class="button button-clear button-light">Continuar</a>
+    </div>-->
+  </ion-header-bar>
+  <ion-content>
+
+    <div class="card" ng-show="result !== undefined" class="error-message">
+      <div class="item item-divider">
+        Resultado: 
+      </div>
+      <div class="item item-text-wrap">
+        {{result}}
+      </div>
+    </div>
+    <form ng-submit="invite()">
+      <div class="card">
+        <div class="item item-text-wrap">
+          Nu3 é um aplicativo de acompanhamento nutricional e suas principais funcionalidades envolve o acompanhamento de um nutricionista.
+          Verificamos que você não possui ainda um nutricionista para te acompanhar. Agende uma consulta e mostre a aplicação para seu nutricionista!
+          Fique à vontade em convida-lo utilizando o formulário abaixo. 
+        </div>
+      </div>
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Nome</span>
+          <input type="text" ng-model="nutri.name">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Email</span>
+          <input type="email" ng-model="nutri.email">
+        </label>
+        
+        <label class="feed-item no-border">
+          <button class="button button-block button-energized no-padding" type="submit">Enviar Convite</button>
+        </label>
+      </div>
+      
+      <!--<ion-checkbox ng-model="forget.checked" ng-change="saveRemember()">
+          {{forget.text}}
+      </ion-checkbox>-->
+    </form>
+    <button class="button button-balanced button-clear pull-right forgot-text" ng-click="goHome()">Continuar com a aplicação</button>
+    <p class="prettyline-text-right"></p>
+    
+    
+  </ion-content>    
+</ion-modal-view>
