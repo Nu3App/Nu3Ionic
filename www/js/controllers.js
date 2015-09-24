@@ -76,6 +76,7 @@ angular.module('starter.controllers', [])
   var day = Date.today();
   var promiseList = [];
   var contador = 0;
+  var flag = 0;
   $scope.feed = [];
   $scope.offlinePhotos = [];
   $scope.scroll = false;
@@ -85,12 +86,14 @@ angular.module('starter.controllers', [])
   var emptySince = null;
   var userInfo = JSON.parse(window.localStorage['user'] || '{}');
 
-
   if (userInfo.hasOwnProperty('idUsuario')){
+    console.log("Testando usuario...");
     user = userInfo;
     $scope.me = user.nomeUsuario;
     ConstructFeed();
   }
+
+
 
   
 
@@ -105,9 +108,8 @@ angular.module('starter.controllers', [])
     $scope.$digest();
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
-    if($scope.feed.length < 2 && contador < 31){
+    if($scope.feed.length < 3){
       console.log("feed muito pequeno, carregando mais dados...");
-      contador += 1;
       $scope.loadMore();
     }
     else{
@@ -173,20 +175,16 @@ angular.module('starter.controllers', [])
     
   }
 
- function ConstructFeed(){
-  console.log("ConstructFeed Call");
-  $ionicLoading.show({
-    content: 'Loading Data',
-    animation: 'fade-in',
-    showBackdrop: false,
-    maxWidth: 200,
-    showDelay: 300
-  });
+  function ConstructFeed(){
+    console.log("ConstructFeed Call");
+    $ionicLoading.show({
+      content: 'Loading Data',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 300
+    });
 
-    //HANDSHAKE:
-  
-
-    
     $scope.feed = [];
     $scope.offlinePhotos = [];
 
@@ -272,7 +270,10 @@ angular.module('starter.controllers', [])
         maxWidth: 200,
         showDelay: 300
     });
-    console.log("Load More Day: " + day.toString("dd/MM"));
+    console.log("Primeira data = " + user.primeiraData);
+    console.log("Comparando " + Date.parse(user.primeiraData).getTime() + " COM " + day.getTime());
+    if(Date.parse(user.primeiraData).getTime() <= day.getTime()){
+      console.log("Load More Day: " + day.toString("dd/MM"));
       ImagensServices.recuperaImagemData(day, end).then(
         function onFulfilled(ajaxData){
           console.log("AJAX promise fulfulled!");
@@ -292,14 +293,19 @@ angular.module('starter.controllers', [])
             }
             $scope.$emit('todo:listAdded');
           });
-
         },
         function onRejected(reason){
           console.log("Ajax Feed was Rejected because: " + JSON.stringify(reason));
           $state.go('login');
         }
-    );
-
+      );
+    }
+    else{
+      console.log("Chegou na primeira data!!!");
+      $scope.scroll = false;
+      $scope.$digest();
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
   }
 
   function offlineFeed(){
@@ -529,7 +535,7 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+.controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, ImagensServices, UserService, DBService) {
   //Status: Funcionando como esperado, esperando implementação de webservice adicional de associação de nutricionista
   $scope.message = "";
   
@@ -543,16 +549,31 @@ angular.module('starter.controllers', [])
         function onFulfilled(result){
           console.log("Usuario logado: " + result.idUsuario);
           result.email = $scope.user.email;
-          user = result;
+          
          $scope.user.senha = null;
-         window.localStorage['user'] = JSON.stringify(result);
+         console.log("Chamada de webservice de primeira Data!");
+         ImagensServices.recuperaPrimeiraData(result.token).then(
+            function onFulfilled(date){
+              var fixDate = date.substring(1,11);
+              console.log("Recuperado primeira data: " + fixDate);
+              //var parsedDate = Date.parseExact(fixDate, "dd/MM/yyyy");
+              result.primeiraData = fixDate;
+              console.log("Dados do usuário inseridos no localstorage...");
+              window.localStorage['user'] = JSON.stringify(result);
+              user = result;
+            },
+            function onError(){
+              console.log("Erro ao recuperar primeira data!");
+            }
+          ) 
+         
          //Handshake = Se o webservice voltar os dados da nutri pelo mesmo result fazer a verificação agora:
          /*
           if(result.hasOwnProperty('idNutri'));
           //senão chamar webservice de associação e inserir dentro do json result que ficara guardado no localStorage
          */
          //DBService.insertUser(result).then(function(){
-          console.log("Dados do usuário inseridos no banco de dados..." + JSON.stringify(result));
+          
             
           console.log("Checando o HANDSHAKE...");
             if (result.hasOwnProperty('idNutri')){

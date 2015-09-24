@@ -1,5 +1,7 @@
-var urlService = "http://nu3.unifesp.br/nutri-rest-patient/rest/"
-//server test: http://200.144.92.167:8080/nu3
+var urlService = "http://200.144.92.166:8080/nutri-rest-patient/rest/"
+//server produção: http://200.144.92.167:8080/nu3
+//server test: http://200.144.92.166:8080/nu3
+//http://nu3.unifesp.br/nutri-rest-patient/rest/
 
 angular.module('nu3.services', [])
 .service('UserService', function($rootScope, $ionicModal, $timeout) {
@@ -421,6 +423,11 @@ angular.module('nu3.services', [])
       var url = urlService + "image/criaImagem";
       var dataE = {"token" : user.token, "nomeFoto" : title , "descricao" : timestamp , "base64code" : base64};
       return AJAXtextService(url, dataE, "Cria Foto: ");
+    },
+    recuperaPrimeiraData: function(token){
+      var dataE = {"token" : token }
+      var url = urlService + "image/dataPrimeiraImagem";
+      return AJAXtextService(url, dataE, "Primeira DAta: ");
     }
   }
 })
