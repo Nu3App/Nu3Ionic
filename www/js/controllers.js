@@ -109,7 +109,7 @@ angular.module('starter.controllers', [])
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
     if($scope.feed.length < 3){
-      console.log("feed muito pequeno, carregando mais dados...");
+      //console.log("feed muito pequeno, carregando mais dados...");
       $scope.loadMore();
     }
     else{
@@ -271,12 +271,12 @@ angular.module('starter.controllers', [])
         showDelay: 300
     });
     console.log("Primeira data = " + user.primeiraData);
-    console.log("Comparando " + Date.parse(user.primeiraData).getTime() + " COM " + day.getTime());
-    if(Date.parse(user.primeiraData).getTime() <= day.getTime()){
-      console.log("Load More Day: " + day.toString("dd/MM"));
+    //console.log("Comparando " + Date.parse(user.primeiraData).getTime() + " COM " + day.getTime());
+    if(user.primeiraData && Date.parse(user.primeiraData).getTime() <= day.getTime()){
+      //console.log("Load More Day: " + day.toString("dd/MM"));
       ImagensServices.recuperaImagemData(day, end).then(
         function onFulfilled(ajaxData){
-          console.log("AJAX promise fulfulled!");
+          //console.log("AJAX promise fulfulled!");
           prepareFeed(ajaxData).then(function(photos){
             if(photos){
               console.log("Dia " + day.toString("dd/MM") + "não vazio");
@@ -286,7 +286,7 @@ angular.module('starter.controllers', [])
                 $scope.emptyDays = null;
               }
               $scope.feed.push(dayEntry);
-              console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
+              //console.log("Dia " + day.toString("dd/MM") + " inserido no feed!");
             }
             else{
               buildEmptyCycle(dayEntry.label);
@@ -305,6 +305,7 @@ angular.module('starter.controllers', [])
       $scope.scroll = false;
       $scope.$digest();
       $scope.$broadcast('scroll.infiniteScrollComplete');
+      $ionicLoading.hide();
     }
   }
 
@@ -538,7 +539,7 @@ angular.module('starter.controllers', [])
 .controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, ImagensServices, UserService, DBService) {
   //Status: Funcionando como esperado, esperando implementação de webservice adicional de associação de nutricionista
   $scope.message = "";
-  
+  window.localStorage.removeItem('user');
   $scope.user = {
     email: null,
     senha: null
@@ -559,11 +560,13 @@ angular.module('starter.controllers', [])
               //var parsedDate = Date.parseExact(fixDate, "dd/MM/yyyy");
               result.primeiraData = fixDate;
               console.log("Dados do usuário inseridos no localstorage...");
-              window.localStorage['user'] = JSON.stringify(result);
+              window.localStorage.setItem('user', JSON.stringify(result));
               user = result;
             },
             function onError(){
               console.log("Erro ao recuperar primeira data!");
+              window.localStorage.setItem('user', JSON.stringify(result));
+              user = result;
             }
           ) 
          
@@ -1046,7 +1049,7 @@ angular.module('starter.controllers', [])
  //Status: Em desenvolvimento
   var userInfo = JSON.parse(window.localStorage['user'] || '{}');
   $scope.nutri = {
-    name: 'Fulana',
+    name: null,
     email: null
   }
 

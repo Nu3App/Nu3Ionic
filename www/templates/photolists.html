@@ -95,6 +95,13 @@
           </div>
       </div>
     </div>
+    <div id="NoMoreDays" ng-hide="scroll">
+      <div class="card feed-card">
+          <div class="item item-text-wrap">
+              <center>Não há mais fotos para serem carregadas...</center>
+          </div>
+      </div>
+    </div>
     <ion-infinite-scroll class="has-tabs" immediate-check="false" on-infinite="loadMore()" distance="1%" ng-if="scrollCheck()">
     </ion-infinite-scroll>
     <!--
