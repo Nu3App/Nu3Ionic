@@ -77,6 +77,7 @@ angular.module('starter.controllers', [])
   var promiseList = [];
   var contador = 0;
   var flag = 0;
+  $scope.firstDay = false;
   $scope.feed = [];
   $scope.offlinePhotos = [];
   $scope.scroll = false;
@@ -105,7 +106,10 @@ angular.module('starter.controllers', [])
   });
 
   $rootScope.$on('todo:listAdded', function() {
-    $scope.$digest();
+    if(!$scope.$$phase) {
+      $scope.$digest();
+    }
+    
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
     if($scope.feed.length < 3){
@@ -114,7 +118,10 @@ angular.module('starter.controllers', [])
     }
     else{
       $ionicLoading.hide();
-      $scope.scroll = true;
+      if($scope.firstDay == false){
+        $scope.scroll = true;
+      }
+      
     }
   });
 
@@ -145,7 +152,7 @@ angular.module('starter.controllers', [])
 
   $scope.scrollCheck = function(){
       //console.log("Checando Requerimentos para o Scroll Infinito...");
-      if($scope.scroll == true && $cordovaNetwork.isOnline()){ //TODO chamar webservice de primeira data.
+      if($scope.firstDay == false && $scope.scroll == true && $cordovaNetwork.isOnline()){ //TODO chamar webservice de primeira data.
         return true;
       }
       else return false;
@@ -302,10 +309,11 @@ angular.module('starter.controllers', [])
     }
     else{
       console.log("Chegou na primeira data!!!");
-      $scope.scroll = false;
-      $scope.$digest();
+      $scope.firstDay = true;
+      $scope.$emit('todo:listAdded');
+      /*$scope.$digest();
       $scope.$broadcast('scroll.infiniteScrollComplete');
-      $ionicLoading.hide();
+      $ionicLoading.hide();*/
     }
   }
 

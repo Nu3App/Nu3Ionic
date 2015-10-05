@@ -1,4 +1,4 @@
-<ion-view view-title="<img src='img/unimed_header.jpg' height='40px' width='40px'><span class='header-title'> Home </span>">
+<ion-view view-title="<img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Home </span>">
   <ion-content class="has-tabs">
     <!--<label class="pull-right">{{network}}</label>-->
     <div class="card" ng-show="offlineFeed">
@@ -95,7 +95,7 @@
           </div>
       </div>
     </div>
-    <div id="NoMoreDays" ng-hide="scroll">
+    <div id="NoMoreDays" ng-show="firstDay">
       <div class="card feed-card">
           <div class="item item-text-wrap">
               <center>Não há mais fotos para serem carregadas...</center>
@@ -123,7 +123,7 @@
   </ion-footer-bar>
   -->
   </ion-content>
-  <div class="tabs-striped tabs-background-balanced tabs-color-light">
+  <div class="tabs-striped tabs-background-dark tabs-color-energized">
     <div class="tabs">
         <a class="tab-item disable-user-behavior active" ui-sref="#">
           <i class="icon ion-home"></i>Home

@@ -1,4 +1,4 @@
-var urlService = "http://200.144.92.166:8080/nutri-rest-patient/rest/"
+var urlService = "http://nu3.unifesp.br/nutri-rest-patient/rest/"
 //server produção: http://200.144.92.167:8080/nu3
 //server test: http://200.144.92.166:8080/nu3 
 //http://nu3.unifesp.br/nutri-rest-patient/rest/

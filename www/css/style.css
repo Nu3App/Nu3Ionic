@@ -22,8 +22,8 @@
 }
 
 .energized-text{
-	color: #008a56 !important;
-/* #ffc900 !important; */
+	color: #ffc900 !important;
+/*  #008a56 !important;*/
 }
 
 .forgot-text{
@@ -150,16 +150,16 @@
 .prettyline {
   margin: 25px 0;
   height: 1px;
-  background: #008a56; /*#FFBD21;*/
-  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #008a56));
+  background:  #FFBD21; /* #008a56;*/
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #FFBD21;));
   
 }
 
 .prettyline-text-right {
   margin: 25px 0;
   height: 1px;
-  background: #008a56; /*#FFBD21;*/
-  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(#008a56), color-stop(50%, #008a56));
+  background:  #FFBD21; /*#008a56;*/
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(#FFBD21), color-stop(50%, #FFBD21;));
 }
 
 div.footer-button a.button.button-full {
@@ -227,8 +227,8 @@ div.footer-button a.button.button-full {
 	}
 
 .bubble2{
-    background-color: #008a56;/*#ffc900;*/
-    color: white;
+    background-color: #ffc900;/* #008a56;*/
+    color: black;
     border-radius: 5px;
     box-shadow: 0 0 6px #B2B2B2;
     display: inline-block;
@@ -244,7 +244,7 @@ div.footer-button a.button.button-full {
 .bubble2::before {
 
 float:right;
-    background-color: #008a56; /*#ffc900;*/
+    background-color: #ffc900; /* #008a56;*/
     content: "\00a0";
     display: block;
     height: 19px;
@@ -265,7 +265,7 @@ float:right;
 .bubble2{
 		float: right;
 		width: 80%;
-		background-color: #008a56; /*#ffc900;*/
+		background-color: #ffc900; /* #008a56;*/
 		border-radius: 5px;
 		box-shadow: 0 0 6px #B2B2B2;
 		display: inline-block;
