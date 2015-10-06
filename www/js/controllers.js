@@ -109,10 +109,9 @@ angular.module('starter.controllers', [])
     if(!$scope.$$phase) {
       $scope.$digest();
     }
-    
     console.log('Event: todo:listAdded');
     $scope.$broadcast('scroll.infiniteScrollComplete');
-    if($scope.feed.length < 3){
+    if(!$scope.firstDay && $scope.feed.length < 3){
       //console.log("feed muito pequeno, carregando mais dados...");
       $scope.loadMore();
     }
@@ -271,15 +270,15 @@ angular.module('starter.controllers', [])
       cycle: null 
     }
     $ionicLoading.show({
-        content: 'Loading Data',
-        animation: 'fade-in',
-        showBackdrop: false,
-        maxWidth: 200,
-        showDelay: 300
+      content: 'Loading Data',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 300
     });
     console.log("Primeira data = " + user.primeiraData);
     //console.log("Comparando " + Date.parse(user.primeiraData).getTime() + " COM " + day.getTime());
-    if(user.primeiraData && Date.parse(user.primeiraData).getTime() <= day.getTime()){
+    if(user.primeiraData && Date.parseExact(user.primeiraData, "dd/MM/yyyy").getTime() <= day.getTime()){
       //console.log("Load More Day: " + day.toString("dd/MM"));
       ImagensServices.recuperaImagemData(day, end).then(
         function onFulfilled(ajaxData){
@@ -568,37 +567,13 @@ angular.module('starter.controllers', [])
               //var parsedDate = Date.parseExact(fixDate, "dd/MM/yyyy");
               result.primeiraData = fixDate;
               console.log("Dados do usuário inseridos no localstorage...");
-              window.localStorage.setItem('user', JSON.stringify(result));
-              user = result;
+              checkHandshake(result);
             },
             function onError(){
               console.log("Erro ao recuperar primeira data!");
-              window.localStorage.setItem('user', JSON.stringify(result));
-              user = result;
+              checkHandshake(result);
             }
           ) 
-         
-         //Handshake = Se o webservice voltar os dados da nutri pelo mesmo result fazer a verificação agora:
-         /*
-          if(result.hasOwnProperty('idNutri'));
-          //senão chamar webservice de associação e inserir dentro do json result que ficara guardado no localStorage
-         */
-         //DBService.insertUser(result).then(function(){
-          
-            
-          console.log("Checando o HANDSHAKE...");
-            if (result.hasOwnProperty('idNutri')){
-              console.log("Warning: Existe associação com uma nutricionista");
-              $scope.$emit('todo:listChanged');
-              $state.go('app.photolists');
-            }
-            else{
-              console.log("Warning: Não existe associação com uma nutricionista");
-              $state.go('invite');
-            }
-           
-            
-         //});
         },
         function onRejected(reason, status){
           //do error handling
@@ -612,6 +587,8 @@ angular.module('starter.controllers', [])
         }
 
       );
+
+    
   };
 
   $scope.goHome = function(){
@@ -619,6 +596,21 @@ angular.module('starter.controllers', [])
     $scope.$emit('todo:listChanged');
     $state.go('app.photolists');
 
+  }
+
+  function checkHandshake(result){
+    console.log("Checando o HANDSHAKE...");
+    window.localStorage.setItem('user', JSON.stringify(result));
+    user = result;
+    if (result.hasOwnProperty('idNutri')){
+      console.log("Warning: Existe associação com uma nutricionista");
+      $scope.$emit('todo:listChanged');
+      $state.go('app.photolists');
+    }
+    else{
+      console.log("Warning: Não existe associação com uma nutricionista");
+      $state.go('invite');
+    }
   }
 
   /*$scope.$on('event:auth-loginRequired', function(e, rejection) {
@@ -680,12 +672,30 @@ angular.module('starter.controllers', [])
   $scope.message = "";
   
   $scope.user = {
+    email: null,
     currentPW: null,
     newPW: null,
     newPWC: null
   };
  
-  $scope.sendMail = function() { 
+  $scope.sendMail = function() {
+    if($scope.user.email){
+      AuthenticationService.forgot($scope.user.email).then(
+        function onFulfilled(result){
+          console.log(result + " = " + JSON.stringify(result));
+          $scope.result = "Pedido enviado com sucesso aguarde e em instantes você receberá um email com sua nova senha."
+          $scope.$digest();
+        },
+        function onRejected(reason, status){
+            $scope.result = "Falha ao enviar o pedido, verifique se o email está correto."
+            $scope.$digest();
+        }
+      )
+    }
+    else{
+      $scope.result = "Por favor preencha um email válido."
+    }
+    
   };
 
   $scope.resetPassword = function() { 
@@ -749,17 +759,39 @@ angular.module('starter.controllers', [])
 
     $scope.savePicture = function() {
       if(!$scope.photoTitle){
-        $scope.blankTitle = true;
+        $scope.warning = "Por favor, descreva sua refeição.";
         $scope.savingPicture = false;
+        if(!$scope.$$phase) {
+          $scope.$digest();
+        }
       }
       else{
         if(flag == true){
-          $scope.blankTitle = false;
-          $scope.savingPicture = true;
-          flag = false;
-          var imgURI = $scope.imgURI;
-          //console.log("Img URI: " + imgURI);
-          buildImageData(imgURI); 
+          $scope.warning = null;
+          if($scope.loadedPicture){
+            if($scope.selectedHour && $scope.selectedDay){
+              $scope.savingPicture = true;
+              flag = false;
+              var imgURI = $scope.imgURI;
+            //console.log("Img URI: " + imgURI);
+              $scope.warning = "Salvando...";
+              $scope.spinning = true;
+              buildImageData(imgURI); 
+            }
+            else{
+              $scope.warning = "Por favor, selecione um dia e hora para essa refeição";
+              if(!$scope.$$phase) {
+                $scope.$digest();
+              }
+            }
+          }
+          else{
+            $scope.savingPicture = true;
+            flag = false;
+            var imgURI = $scope.imgURI;
+            //console.log("Img URI: " + imgURI);
+            buildImageData(imgURI); 
+          }   
         }
       }
       
@@ -822,6 +854,8 @@ angular.module('starter.controllers', [])
     }
 
     function addPhotoToDatabase(image, online){
+      $scope.warning = false;
+      $scope.spinning = false;
       DBService.addPhoto(image, online).then(
         function onSuccess(){
             flag = true;
@@ -868,6 +902,7 @@ angular.module('starter.controllers', [])
               console.log("Imagem criada no servidor com id: " + id);
               image.idImagem = id;
               addPhotoToDatabase(image, 1);
+              
             },
             function onError(err){
               console.log("Erro no AJAX de criar foto: " + JSON.stringify(err));
@@ -881,7 +916,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService) {
+.controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService, ImagensServices) {
   $scope.message = "";
   $scope.user = user;
   $scope.imgURI = null;
@@ -895,12 +930,32 @@ angular.module('starter.controllers', [])
   }
   DBService.getPerfil(user.idUsuario).then(
     function onSucess(data){
-      if(data.perfil != null){
+      console.log("Perfil return: " + JSON.stringify(data));
+      if(data != null){
         console.log("Perfil carregado: " + JSON.stringify(data.perfil));
         $scope.perfilPhoto = "data:image/jpeg;base64," + data.perfil;
         $scope.$digest();
       }
+      else{
+        ImagensServices.obtemAvatar().then(
+          function onSucess(result){
+            console.log("Avatar recuperado no servidor");
+            DBService.addPerfil(user.idUsuario, result.avatar).then(
+            function onSucess(){
+              console.log("Avatar salvo no banco de dados local");
+              $scope.perfilPhoto = "data:image/jpeg;base64," + result.avatar;
+              $scope.$digest();
+            });
+          },
+          function onError(error){
+            //mensagem que não existe avatar yet? 
+          }
+        )
+      }
 
+    },
+    function onError(){
+      console.log("Erro ao recuperar perfil...");
     }
         
   );
@@ -914,10 +969,21 @@ angular.module('starter.controllers', [])
       DBService.addPerfil(user.idUsuario, base64).then(
         function onSucess(){
           $scope.perfilPhoto = "data:image/jpeg;base64," + base64;
-          $scope.imgURI = null;
-          $scope.photoSaved = true;
-          $scope.$digest();
-          console.log("Perfil salvo no banco de dados com sucesso.");
+          ImagensServices.enviaAvatar(base64).then(
+            function onSucess(result){
+              $scope.imgURI = null;
+              $scope.photoSaved = true;
+              $scope.$digest();
+              console.log("Perfil salvo no banco de dados com sucesso.");
+            },
+            function onError(error){
+              $scope.imgURI = null;
+              $scope.photoSaved = true;
+              $scope.$digest();
+              console.log("Erro envio avatar.");
+            }
+          )
+          
         } 
       );
     });
@@ -1053,9 +1119,10 @@ angular.module('starter.controllers', [])
  
 })
 
-.controller("InviteCtrl", function($scope, $state) {
+.controller("InviteCtrl", function($scope, $state, AuthenticationService) {
  //Status: Em desenvolvimento
   var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+  console.log("UserInfo = " + JSON.stringify(userInfo));
   $scope.nutri = {
     name: null,
     email: null
@@ -1082,7 +1149,23 @@ angular.module('starter.controllers', [])
 
 
   $scope.invite = function() {
-    //chamada de webservice para geração de email
+    if($scope.nutri.email && $scope.nutri.name){
+      AuthenticationService.invite($scope.nutri, userInfo).then(
+        function onFulfilled(result){
+          console.log(result + " = " + JSON.stringify(result));
+          $scope.result = "Convite enviado com sucesso."
+          $scope.$digest();
+        },
+        function onRejected(reason, status){
+            $scope.result = "Falha ao enviar convite, tente novamente."
+            $scope.$digest();
+        }
+      )
+    }
+    else{
+      $scope.result = "Por favor preencha os campos com os dados válidos da nutricionista."
+
+    }
     console.log("Invite Trigger");
   };
 });

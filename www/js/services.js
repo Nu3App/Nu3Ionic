@@ -1,7 +1,8 @@
-var urlService = "http://nu3.unifesp.br/nutri-rest-patient/rest/"
+var urlService = "http://200.144.92.167:8080/nutri-rest-patient/rest/"
 //server produção: http://200.144.92.167:8080/nu3
 //server test: http://200.144.92.166:8080/nu3 
 //http://nu3.unifesp.br/nutri-rest-patient/rest/
+
 
 angular.module('nu3.services', [])
 .service('UserService', function($rootScope, $ionicModal, $timeout) {
@@ -104,10 +105,6 @@ angular.module('nu3.services', [])
     $http.post(url, dataE,{transformRequest: transformRequestAsFormPost})
       .success(function (data) {
         console.log(string + JSON.stringify(data));
-        if(url == urlService + "image/obtemResumoImagens"){
-          console.log("Recuperando image/obtemResumoImagens " + dataE.millisDataInicio);
-          data.stamp = dataE.millisDataInicio;
-        }
         deferred.resolve(data);
       })
       .error(function (data, status) {
@@ -135,6 +132,18 @@ angular.module('nu3.services', [])
       var dataE = {"email" : user.email, "senha" : user.senha, "nome" : user.nome};
       var url = urlService + "auth/criaUsuario";
       return AJAXservice(url, dataE, "Login Data: ");
+    },
+    forgot: function(email){
+      email = email.trim().toLowerCase();
+      var dataE = {"email" : email};
+      var url = urlService + "auth/forgotPassword";
+      return AJAXservice(url, dataE, "Forgot Data: ");
+    },
+    invite: function(nutri, user){
+      nutri.email = nutri.email.trim().toLowerCase();
+      var dataE = {"idUsuario": user.idUsuario, "token": user.token, "nomeNutricionista": nutri.nome, "emailNutricionista": nutri.email};
+      var url = urlService + "mail/inviteNutricionista";
+      return AJAXservice(url, dataE, "Invite Data: ");
     },	
     loginCancelled: function() {
       authService.loginCancelled();
@@ -189,7 +198,12 @@ angular.module('nu3.services', [])
     console.log("DB: loading perfil from user: " + id);
     var query = "SELECT perfil FROM perfils WHERE ID = ?";
     $cordovaSQLite.execute(self.db, query, [id]).then(function(res) {
-      deferred.resolve(res.rows.item(0));
+      console.log("Results: " + JSON.stringify(res) + " item: " + JSON.stringify(res.rows.item(0)));
+      if(res.rows.length > 0){
+        deferred.resolve(res.rows.item(0));
+      }
+      else deferred.resolve(null);
+      
     }, function (err) {
         console.error(JSON.stringify(err));
         deferred.reject(err);
@@ -428,7 +442,19 @@ angular.module('nu3.services', [])
       var dataE = {"token" : token }
       var url = urlService + "image/dataPrimeiraImagem";
       return AJAXtextService(url, dataE, "Primeira DAta: ");
+    },
+    obtemAvatar: function(){
+      console.log("Service obtem perfil de : " + user.idUsuario + "token: " + user.token);
+      var dataE = {"token" : user.token, "idPaciente": user.idUsuario};
+      var url = urlService + "image/obtemAvatarPaciente";
+      return AJAXservice(url, dataE, "Obtem Avatar: ");
+    },
+    enviaAvatar: function(base64){
+      var dataE = {"token" : user.token, "idPaciente": user.idUsuario, "avatar": base64};
+      var url = urlService + "image/insereAvatarPaciente";
+      return AJAXservice(url, dataE, "Obtem Avatar: ");
     }
+
   }
 })
 

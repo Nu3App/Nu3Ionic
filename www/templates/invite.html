@@ -7,14 +7,7 @@
   </ion-header-bar>
   <ion-content>
 
-    <div class="card" ng-show="result !== undefined" class="error-message">
-      <div class="item item-divider">
-        Resultado: 
-      </div>
-      <div class="item item-text-wrap">
-        {{result}}
-      </div>
-    </div>
+    
     <form ng-submit="invite()">
       <div class="card">
         <div class="item item-text-wrap">
@@ -36,6 +29,14 @@
         <label class="feed-item no-border">
           <button class="button button-block button-energized no-padding" type="submit">Enviar Convite</button>
         </label>
+      </div>
+      <div class="card" ng-show="result !== undefined" class="error-message">
+        <div class="item item-divider">
+          Resultado: 
+        </div>
+        <div class="item item-text-wrap">
+          {{result}}
+        </div>
       </div>
       
       <!--<ion-checkbox ng-model="forget.checked" ng-change="saveRemember()">

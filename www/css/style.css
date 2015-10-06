@@ -151,7 +151,7 @@
   margin: 25px 0;
   height: 1px;
   background:  #FFBD21; /* #008a56;*/
-  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #FFBD21;));
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(white), color-stop(50%, #FFBD21));
   
 }
 
@@ -159,7 +159,7 @@
   margin: 25px 0;
   height: 1px;
   background:  #FFBD21; /*#008a56;*/
-  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(#FFBD21), color-stop(50%, #FFBD21;));
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(white), to(#FFBD21), color-stop(50%, #FFBD21));
 }
 
 div.footer-button a.button.button-full {

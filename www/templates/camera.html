@@ -40,16 +40,23 @@
             <i class="icon ion-clock"></i>
           </a>
         </div>
-        <center><p> Dia: {{selectedDay}} - Hora: {{selectedHour}}</p></center>
-        
+        <div class = "row row-center">
+          <div class="col col-50">
+            <p> Dia: {{selectedDay}} </p>
+          </div>
+          <div class="col col-50">
+            <p> Hora: {{selectedHour}}</p>
+          </div>
+        </div>
       </div>
       
       <button class="button button-full button-energized icon-right ion-archive" ng-hide="imgURI === undefined || loadedPicture === true || savingPicture === true" class="button" ng-click="savePicture()">Salvar</button>
       <button class="button button-full button-energized icon-right ion-archive" ng-show="loadedPicture === true && selectedDay !== undefined && selectedHour !== undefined" class="button" ng-click="savePicture()">Salvar</button>
     </div>
-    <div class="card" ng-show="blankTitle === true" class="error-message">
+    <div class="card" ng-show="warning" class="error-message">
       <div class="item item-text-wrap">
-        Por favor, descreva sua refeição.
+        {{warning}}
+        <ion-spinner class="spinner-energized" ng-show="spinning"></ion-spinner>
       </div>
     </div>  
     <img ng-show="imgURI !== undefined" ng-src="{{imgURI}}" class="img-preview">
@@ -58,7 +65,7 @@
     </div>
   </ion-content>
 
-  <div class="tabs-striped tabs-background-dark tabs-color-energized">
+  <div class="tabs-striped tabs-background-dark tabs-color-energized hide-on-keyboard-open">
       <div class="tabs">
           <a navClear class="tab-item disable-user-behavior" title="Home" ui-sref="app.photolists">
             <i class="icon ion-home"></i>Home
