@@ -11,19 +11,60 @@
                         {
                             "xml": "<activity android:label=\"@string/app_name\" android:name=\"org.pgsqlite.SQLitePlugin\"></activity>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<activity android:exported=\"true\" android:name=\"com.adobe.phonegap.push.PushHandlerActivity\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<receiver android:name=\"com.adobe.phonegap.push.CordovaGCMBroadcastReceiver\" android:permission=\"com.google.android.c2dm.permission.SEND\"><intent-filter><action android:name=\"com.google.android.c2dm.intent.RECEIVE\" /><action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" /><category android:name=\"br.example.avestruz\" /></intent-filter></receiver>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<service android:name=\"com.adobe.phonegap.push.GCMIntentService\" />",
+                            "count": 1
                         }
                     ],
                     "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "count": 2
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+                            "count": 2
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />",
+                            "count": 1
+                        }
+                    ],
+                    "/manifest": [
                         {
                             "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
                             "count": 1
                         },
                         {
-                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "xml": "<uses-permission android:name=\"android.permission.WAKE_LOCK\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.VIBRATE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"com.google.android.c2dm.permission.RECEIVE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<permission android:name=\"br.example.avestruz.permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"br.example.avestruz.permission.C2D_MESSAGE\" />",
                             "count": 1
                         }
-                    ],
-                    "/manifest": []
+                    ]
                 }
             },
             "res/xml/config.xml": {
@@ -34,11 +75,19 @@
                             "count": 1
                         },
                         {
+                            "xml": "<feature name=\"Keyboard\"><param name=\"android-package\" value=\"com.ionic.keyboard.IonicKeyboard\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
                             "xml": "<feature name=\"DatePickerPlugin\"><param name=\"android-package\" value=\"com.plugin.datepicker.DatePickerPlugin\" /></feature>",
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
+                            "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         },
                         {
@@ -54,19 +103,27 @@
                             "count": 1
                         },
                         {
+                            "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"PushNotification\"><param name=\"android-package\" value=\"com.adobe.phonegap.push.PushPlugin\" /></feature>",
+                            "count": 1
+                        },
+                        {
                             "xml": "<preference name=\"webView\" value=\"org.crosswalk.engine.XWalkWebViewEngine\" />",
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
+                            "xml": "<preference default=\"14+\" name=\"xwalkVersion\" />",
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "xml": "<preference default=\"--disable-pull-to-refresh-effect\" name=\"xwalkCommandLine\" />",
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Keyboard\"><param name=\"android-package\" value=\"com.ionic.keyboard.IonicKeyboard\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "xml": "<preference default=\"embedded\" name=\"xwalkMode\" />",
                             "count": 1
                         }
                     ]
@@ -78,22 +135,10 @@
         "com.brodysoft.sqliteStorage": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
-        "com.plugin.datepicker": {
+        "com.ionic.keyboard": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
-        "org.apache.cordova.network-information": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
-        "org.apache.cordova.camera": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
-        "org.apache.cordova.file": {
-            "PACKAGE_NAME": "br.example.avestruz"
-        },
-        "cordova-plugin-crosswalk-webview": {
+        "cordova-plugin-datepicker": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
         "cordova-plugin-device": {
@@ -102,7 +147,25 @@
         "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "br.example.avestruz"
         },
-        "com.ionic.keyboard": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "org.apache.cordova.camera": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "org.apache.cordova.console": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "org.apache.cordova.file": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "org.apache.cordova.network-information": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "phonegap-plugin-push": {
+            "PACKAGE_NAME": "br.example.avestruz"
+        },
+        "cordova-plugin-crosswalk-webview": {
             "PACKAGE_NAME": "br.example.avestruz"
         }
     },

@@ -7,9 +7,10 @@
 		</center>
   	</div>
   	<div ng-show="photo !== undefined">
-  		<img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-detail">
   		<div class="card">
+  		  <img ng-show="photo.url !== undefined" ng-src="{{photo.url}}" class="img-detail">
 	      <div class="item item-text-wrap item-borderless">
+	      	
 	        <h1>{{photo.title}}</h1>
 		    <p class="prettyline no-padding"></p>
 		    <div class = "row">

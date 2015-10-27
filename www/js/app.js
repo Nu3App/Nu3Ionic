@@ -7,7 +7,7 @@
 
 var user = null;
 var networkType = null;
-var nu3App = angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'nu3.services'])
+var nu3App = angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 'ngCordova', 'nu3.services'])
 
 .run(function($ionicPlatform, $state, DBService, $cordovaNetwork, $rootScope) {
   $ionicPlatform.ready(function() {

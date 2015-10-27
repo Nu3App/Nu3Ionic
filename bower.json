@@ -3,13 +3,16 @@
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.0.0",
-    "ionic-timepicker": "~0.2.0"
+    "ionic-timepicker": "~0.2.0",
+    "ionic-platform-web-client": "~0.2.0",
+    "ionic-service-core": "~0.1.10"
   },
   "resolutions": {
     "angular-sanitize": "1.3.13",
     "angular-animate": "1.3.13"
   },
   "dependencies": {
-    "ionic-datepicker": "~0.1.3"
+    "ionic-datepicker": "~0.1.3",
+    "ionic-service-core": "~0.1.10"
   }
 }

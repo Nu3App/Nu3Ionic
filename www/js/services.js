@@ -1,36 +1,11 @@
-var urlService = "http://200.144.92.167:8080/nutri-rest-patient/rest/"
+var urlService = "http://200.144.92.167:80/nutri-rest-patient/rest/"
 //server produção: http://200.144.92.167:8080/nu3
 //server test: http://200.144.92.166:8080/nu3 
 //http://nu3.unifesp.br/nutri-rest-patient/rest/
-
+//Google API Project Number: 1056453092172
+//Server Key: AIzaSyB5WDm23cmAekgCuo1RgeKTMoPkeL7FE78
 
 angular.module('nu3.services', [])
-.service('UserService', function($rootScope, $ionicModal, $timeout) {
-  var init = function($scope) {
-    // Form data for the login modal
-    $scope = $scope || $rootScope.$new();
-    //$scope.loginData = {};
-    // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/login.html', {
-      scope: $scope,
-      animation: 'slide-in-up',
-      focusFirstInput: false
-    }).then(function(modal) {
-      $scope.modal = modal;
-    });
-    // Triggered in the login modal to close it
-    $scope.closeLogin = function() {
-      $scope.modal.hide();
-    };
-    // Open the login modal
-    $scope.openLogin = function() {
-      $scope.modal.show();
-    };
-  }
-  return {
-    init: init
-  }
-})
 
 .factory("transformRequestAsFormPost",function() {
 
@@ -144,9 +119,11 @@ angular.module('nu3.services', [])
       var dataE = {"idUsuario": user.idUsuario, "token": user.token, "nomeNutricionista": nutri.nome, "emailNutricionista": nutri.email};
       var url = urlService + "mail/inviteNutricionista";
       return AJAXservice(url, dataE, "Invite Data: ");
-    },	
-    loginCancelled: function() {
-      authService.loginCancelled();
+    },
+    notification: function(data){
+      var dataE = {};
+      var url = urlService + "algumacoisa";
+      return AJAXservice(url, dataE, "Notification Data: ");
     }
   };
 })
@@ -246,23 +223,29 @@ angular.module('nu3.services', [])
 
   self.loadOfflinePhotos = function(){
     var deferred = Q.defer();
-    var query = "SELECT * FROM photos WHERE synchronized=0";
-    $cordovaSQLite.execute(self.db, query).then(function(res) {
-        var len = res.rows.length;
-          //console.log("DB: found photo " + id + "   row lenght: " + len);
-          if(len>0){
-            console.log("DB: Photos offline loaded.");
-            //console.log("ROW: " + JSON.stringify(row));
-            //deferred.resolve(result.rows.item(0)['base64']);
-            deferred.resolve(res.rows);
-          }
-          else{
-            deferred.resolve(null);
-          }
-    }, function (err) {
-        console.error("Photos Offline: ERRO ao carragar do banco de dados!!!");
-        console.error(JSON.stringify(err));
-    });    
+    if(self.db){
+      var query = "SELECT * FROM photos WHERE synchronized=0";
+      $cordovaSQLite.execute(self.db, query).then(function(res) {
+          var len = res.rows.length;
+            //console.log("DB: found photo " + id + "   row lenght: " + len);
+            if(len>0){
+              console.log("DB: Photos offline loaded.");
+              //console.log("ROW: " + JSON.stringify(row));
+              //deferred.resolve(result.rows.item(0)['base64']);
+              deferred.resolve(res.rows);
+            }
+            else{
+              deferred.resolve(null);
+            }
+      }, function (err) {
+          console.error("Photos Offline: ERRO ao carragar do banco de dados!!!");
+          console.error(JSON.stringify(err));
+      });    
+    }
+    else{
+      deferred.reject(null);
+    }
+    
     return deferred.promise;
   },
 
@@ -594,5 +577,26 @@ angular.module('nu3.services', [])
       img.src = imageUri;
     }
 
+  }
+})
+
+.service('AuxServices', function(){
+  return {
+    setImageStyle: function(imgUrl){
+      var img = new Image();
+      var style = "";
+      img.onload = function() {
+        if(this.width >= this.height){
+          console.log("Landscape Image!");
+          style = "img-landscape";
+        }
+        else{
+          console.log("Portrait Image!");
+          style = "img-portrait";
+        }
+      };
+      img.src = imgUrl;
+      return style;
+    }
   }
 })

@@ -22,8 +22,10 @@
     "cordova-plugin-whitelist",
     "org.apache.cordova.camera",
     "org.apache.cordova.file",
-    "cordova-plugin-crosswalk-webview",
-    "cordova-plugin-splashscreen"
+    "cordova-plugin-splashscreen",
+    "phonegap-plugin-push"
   ],
-  "cordovaPlatforms": []
+  "cordovaPlatforms": [
+    "android"
+  ]
 }

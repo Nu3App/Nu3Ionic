@@ -1,7 +1,7 @@
 angular.module('starter.controllers', [])
 
 
-.controller('AppCtrl', function($rootScope, $scope, $ionicModal, $timeout, $ionicLoading, $state, $cordovaNetwork, UserService, DBService) {
+.controller('AppCtrl', function($rootScope, $scope, $ionicModal, $timeout, $ionicLoading, $state, $cordovaNetwork, DBService) {
   // Perform the login action when the user submits the login form
   /*$scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
@@ -34,16 +34,17 @@ angular.module('starter.controllers', [])
       showDelay: 300
   });
 
+  
+
   DBService.status().then(function(){
     console.log("Promessa do banco de dados cumprida...");
-    //UserService.init();
     var userInfo = JSON.parse(window.localStorage['user'] || '{}');
     console.log("userInfo = " + JSON.stringify(userInfo));
     $ionicLoading.hide();
     if (userInfo.hasOwnProperty('idUsuario')){
       user = userInfo;
       var today = Date.today();
-      console.log("teste de tempo: " + Date.parse(user.dataExpiracao).getTime() + '>' + today.getTime());
+      //console.log("teste de tempo: " + Date.parse(user.dataExpiracao).getTime() + '>' + today.getTime());
     }
     else{
       console.log("Usuário Nulo ou Token Expirado");
@@ -87,16 +88,23 @@ angular.module('starter.controllers', [])
   var emptySince = null;
   var userInfo = JSON.parse(window.localStorage['user'] || '{}');
 
-  if (userInfo.hasOwnProperty('idUsuario')){
-    console.log("Testando usuario...");
-    user = userInfo;
-    $scope.me = user.nomeUsuario;
-    ConstructFeed();
-  }
-
-
-
-  
+  DBService.status().then(function(){
+    console.log("Promessa do banco de dados cumprida...");
+    var userInfo = JSON.parse(window.localStorage['user'] || '{}');
+    console.log("userInfo = " + JSON.stringify(userInfo));
+    $ionicLoading.hide();
+    if (userInfo.hasOwnProperty('idUsuario')){
+      user = userInfo;
+      var today = Date.today();
+      $scope.me = user.nomeUsuario;
+      ConstructFeed();
+      //console.log("teste de tempo: " + Date.parse(user.dataExpiracao).getTime() + '>' + today.getTime());
+    }
+    else{
+      console.log("Usuário Nulo ou Token Expirado");
+      $state.go('login');
+    }
+  });
 
   $rootScope.$on('todo:listChanged', function() {
     $scope.feed = [];
@@ -157,9 +165,7 @@ angular.module('starter.controllers', [])
       else return false;
     }
 
-    
-
-  var sort_by = function(field, reverse, primer){
+  var sort_by = function(field, reverse, primer){ //função auxiliar
    var key = primer ? 
        function(x) {return primer(x[field])} : 
        function(x) {return x[field]};
@@ -190,7 +196,7 @@ angular.module('starter.controllers', [])
       maxWidth: 200,
       showDelay: 300
     });
-
+    $scope.firstDay = false;
     $scope.feed = [];
     $scope.offlinePhotos = [];
 
@@ -346,7 +352,7 @@ angular.module('starter.controllers', [])
       },
       function onRejected(reason){
         console.log("A promessa do offline foi rejeitada por algum motivo...");
-        deferred.reject();
+        deferred.resolve(false);
       }
     );
     return deferred.promise;
@@ -458,7 +464,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('PhotoCtrl', function($scope, $stateParams, DBService, $ionicLoading, ImagensServices) {
+.controller('PhotoCtrl', function($scope, $stateParams, DBService, $ionicLoading, ImagensServices, AuxServices) {
   //Status: Funcionando como esperado
   console.log("detalhes: " + JSON.stringify($stateParams));
   $ionicLoading.show({
@@ -514,6 +520,7 @@ angular.module('starter.controllers', [])
           $ionicLoading.hide();
           $scope.photo = result;
           $scope.photo.url = 'data:image/png;base64,' + result.base64;
+          $scope.imgStyle = AuxServices.setImageStyle($scope.photo.url);
           var oneWeekAgo = new Date().last().week().getTime();
           console.log("One Week Ago: " + oneWeekAgo + " Date time: " + result.timestamp);
           if (result.timestamp < oneWeekAgo){
@@ -543,7 +550,7 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, ImagensServices, UserService, DBService) {
+.controller('LoginCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, ImagensServices, DBService) {
   //Status: Funcionando como esperado, esperando implementação de webservice adicional de associação de nutricionista
   $scope.message = "";
   window.localStorage.removeItem('user');
@@ -553,11 +560,46 @@ angular.module('starter.controllers', [])
   };
  
   $scope.login = function() {
+    Ionic.io();
     AuthenticationService.login($scope.user).then(
         function onFulfilled(result){
           console.log("Usuario logado: " + result.idUsuario);
           result.email = $scope.user.email;
           
+          // this will give you a fresh user or the previously saved 'current user'
+          var ioUser = Ionic.User.current();
+
+          // if the user doesn't have an id, you'll need to give it one.
+          if (!ioUser.id || ioUser.id != result.idUsuario) {
+            console.log("Não existe usuario (ou id errada) no servico do Ionic, criando um...");
+            ioUser.id = result.idUsuario//Ionic.User.anonymousId();
+            // user.id = 'your-custom-user-id';
+          }
+          var push = new Ionic.Push({
+            "debug": true,
+            "onNotification": function(notification) {
+              var payload = notification.payload;
+              console.log(notification, payload);
+            }
+          });
+
+          ioUser.set('email', result.email);
+
+          push.register(function callback(pushToken){
+            console.log("Device Token: " + pushToken.token);
+            push.addTokenToUser(ioUser);
+            ioUser.addPushToken(pushToken);
+            //persist the user
+            var success = function(response) {
+              console.log('user was saved');
+            };
+            var failure = function(error) {
+              console.log('user was NOT saved');
+            };
+            ioUser.save().then(success, failure);
+          });
+
+
          $scope.user.senha = null;
          console.log("Chamada de webservice de primeira Data!");
          ImagensServices.recuperaPrimeiraData(result.token).then(
@@ -573,7 +615,8 @@ angular.module('starter.controllers', [])
               console.log("Erro ao recuperar primeira data!");
               checkHandshake(result);
             }
-          ) 
+          )
+          console.log("TESTE"); 
         },
         function onRejected(reason, status){
           //do error handling
@@ -602,7 +645,7 @@ angular.module('starter.controllers', [])
     console.log("Checando o HANDSHAKE...");
     window.localStorage.setItem('user', JSON.stringify(result));
     user = result;
-    if (result.hasOwnProperty('idNutri')){
+    if (result.hasOwnProperty('idNutricionista')){
       console.log("Warning: Existe associação com uma nutricionista");
       $scope.$emit('todo:listChanged');
       $state.go('app.photolists');
@@ -613,13 +656,9 @@ angular.module('starter.controllers', [])
     }
   }
 
-  /*$scope.$on('event:auth-loginRequired', function(e, rejection) {
-    console.log('handling login required');
-    $scope.loginModal.show();
-  });*/  
 })
 
-.controller('RegisterCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+.controller('RegisterCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, DBService) {
   //Status: Funcionando como esperado
   $scope.message = "";
   
@@ -667,7 +706,7 @@ angular.module('starter.controllers', [])
   });*/  
 })
 
-.controller('ForgotCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, UserService, DBService) {
+.controller('ForgotCtrl', function($scope, $http,$ionicModal, $cordovaSQLite, $state, AuthenticationService, DBService) {
   //Status: Esperando implementação dos webservices na parte servidora.
   $scope.message = "";
   
@@ -703,7 +742,7 @@ angular.module('starter.controllers', [])
 
   
 })
-.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService) {
+.controller("PictureCtrl", function($scope,$state, $cordovaCamera, $cordovaSQLite, $cordovaNetwork, $cordovaDatePicker, DBService, ImagensServices, CameraService, AuxServices) {
     $scope.loadedPicture = false;
     $scope.selectedDay = null;
     $scope.selectedHour = null;
@@ -807,12 +846,10 @@ angular.module('starter.controllers', [])
             quality : 90, 
             destinationType : Camera.DestinationType.IMAGE_URI, 
             sourceType : Camera.PictureSourceType.PHOTOLIBRARY, 
-            allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 600,
             targetHeight: 600,
-            //popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: $scope.checkedSave
+            popoverOptions: CameraPopoverOptions,
         }; 
         
         $cordovaCamera.getPicture(options).then(function(imageData) {
@@ -822,6 +859,7 @@ angular.module('starter.controllers', [])
               console.log("EXIF: " + exifObject);
             });
           $scope.imgURI = imageData;
+          $scope.imgStyle = AuxServices.setImageStyle(imageData);
           $scope.loadedPicture = true;
                 
             
@@ -831,23 +869,22 @@ angular.module('starter.controllers', [])
     }
 
     $scope.takePicture = function() {
-        console.log("Salvar no album? " + $scope.checkedSave);
+        
         var options = { 
             quality : 90, 
             destinationType : Camera.DestinationType.IMAGE_URI, 
             sourceType : Camera.PictureSourceType.CAMERA, 
-            allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 600,
             targetHeight: 600,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: $scope.checkedSave
+            popoverOptions: CameraPopoverOptions
         };
  
         $cordovaCamera.getPicture(options).then(function(imageData) {
             //$scope.imgURI = "data:image/jpeg;base64," + imageData;
             $scope.loadedPicture = false;
             $scope.imgURI = imageData;
+            $scope.imgStyle = AuxServices.setImageStyle(imageData);
         }, function(err) {
             console.log("Erro de getPicture...");
         });
@@ -1090,7 +1127,18 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller("NotificationCtrl", function($scope, $cordovaLocalNotification) {
+.controller("NotificationCtrl", function($scope, $cordovaLocalNotification, AuthenticationService) {
+  //processa algumas variaveis, como por exemplo alguns horarios fixos
+  AuthenticationService.notification("mandamos alguma coisa", "idScription").then(
+    function onSuccess(data){
+      //processar
+    },
+    function onError(erro){
+
+    }
+  )
+
+
  //Não funciona como esperado, estudar solução alternativa
     $scope.add = function() {
         var alarmTime = new Date();
