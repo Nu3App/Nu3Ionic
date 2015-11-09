@@ -120,9 +120,9 @@ angular.module('nu3.services', [])
       var url = urlService + "mail/inviteNutricionista";
       return AJAXservice(url, dataE, "Invite Data: ");
     },
-    notification: function(data){
-      var dataE = {};
-      var url = urlService + "algumacoisa";
+    setToken: function(pusherToken){
+      var dataE = {"idUsuario": user.idUsuario, "token": user.token, "pusherToken": pusherToken};
+      var url = urlService + "mail/registerPusherToken";
       return AJAXservice(url, dataE, "Notification Data: ");
     }
   };

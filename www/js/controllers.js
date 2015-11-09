@@ -589,6 +589,14 @@ angular.module('starter.controllers', [])
             console.log("Device Token: " + pushToken.token);
             push.addTokenToUser(ioUser);
             ioUser.addPushToken(pushToken);
+            AuthenticationService.setToken(pushToken.token).then(
+              function onSucess(result){
+                console.log("Token (" + pushToken.token + ") enviado para o servidor: " + result);
+              },
+              function onError(error){
+                console.log("Falha ao enviar token ao servidor: " + JSON.stringify(error));
+              }
+            )
             //persist the user
             var success = function(response) {
               console.log('user was saved');
@@ -1125,46 +1133,6 @@ angular.module('starter.controllers', [])
   }
 
 
-})
-
-.controller("NotificationCtrl", function($scope, $cordovaLocalNotification, AuthenticationService) {
-  //processa algumas variaveis, como por exemplo alguns horarios fixos
-  AuthenticationService.notification("mandamos alguma coisa", "idScription").then(
-    function onSuccess(data){
-      //processar
-    },
-    function onError(erro){
-
-    }
-  )
-
-
- //Não funciona como esperado, estudar solução alternativa
-    $scope.add = function() {
-        var alarmTime = new Date();
-        alarmTime.setMinutes(alarmTime.getMinutes() + 1);
-        $cordovaLocalNotification.add({
-            id: "1234",
-            date: alarmTime,
-            message: "This is a message",
-            title: "This is a title",
-            autoCancel: true,
-            sound: null
-        }).then(function () {
-            console.log("The notification has been set");
-        });
-    };
- 
-    $scope.isScheduled = function() {
-        $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
-            alert("Notification 1234 Scheduled: " + isScheduled);
-        });
-    }
-
-    $scope.$on("$cordovaLocalNotification:added", function(id, state, json) {
-      alert("Added a notification");
-    });
- 
 })
 
 .controller("InviteCtrl", function($scope, $state, AuthenticationService) {
