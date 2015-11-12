@@ -124,6 +124,11 @@ angular.module('nu3.services', [])
       var dataE = {"idUsuario": user.idUsuario, "token": user.token, "pusherToken": pusherToken};
       var url = urlService + "mail/registerPusherToken";
       return AJAXservice(url, dataE, "Notification Data: ");
+    },
+    changePassword: function(password){
+      var dataE = {"token": user.token, "novaSenha": password};
+      var url = urlService + "auth/changePassword";
+      return AJAXservice(url, dataE, "Notification Data: ");
     }
   };
 })

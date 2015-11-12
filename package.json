@@ -23,7 +23,8 @@
     "org.apache.cordova.camera",
     "org.apache.cordova.file",
     "cordova-plugin-splashscreen",
-    "phonegap-plugin-push"
+    "phonegap-plugin-push",
+    "cordova-plugin-crosswalk-webview"
   ],
   "cordovaPlatforms": [
     "android"

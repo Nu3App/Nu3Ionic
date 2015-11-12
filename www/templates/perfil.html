@@ -1,4 +1,4 @@
-<ion-view view-title="<a navClear href='#/app/playlists'><img src='img/nu3_icon.png' height='40px' width='40px'><span class='energized-text header-title'> Perfil </span>">
+<ion-view view-title="<a navClear href='#/app/playlists'><img src='img/nu3_icon.png' height='40px' width='40px'></a><span class='energized-text header-title'> Perfil </span>">
   <ion-content>
     <div class="list card">
 
@@ -35,6 +35,22 @@
 	  <div class="item item-icon-left">
 		<p><i class="icon ion-ios-unlocked"></i>Sessão válida até: <span class="item-note">{{user.tokenExp}}</span></p>
 	  </div>
+	  <form ng-submit="changePassword()">
+	  	<div class="item item-icon-left">   
+          <span class="input-label"><i class="icon ion-ios-locked"></i> Nova senha:</span>
+          <input type="password" ng-model="password.newPW">
+	    </div>
+	    <div class="item item-icon-left">      
+          <span class="input-label"><i class="icon ion-ios-locked-outline"></i>Confirmação nova senha:</span>
+          <input type="password" ng-model="password.newPWConfirm">
+	    </div>
+	    <div class="item">          
+	        <button class="button button-block button-energized no-padding" type="submit">Mudar Senha</button>
+	    </div>
+	    <div class="item" ng-show="password.msg">    
+	        <p>{{password.msg}}</p>
+        </div>
+       </form>
 	</div>
 	
   </ion-content>

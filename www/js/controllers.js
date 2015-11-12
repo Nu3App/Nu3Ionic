@@ -961,11 +961,17 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService, ImagensServices) {
+.controller('PerfilCtrl', function($scope, $state, $cordovaCamera, DBService, CameraService, ImagensServices, AuthenticationService) {
   $scope.message = "";
   $scope.user = user;
   $scope.imgURI = null;
   $scope.perfilPhoto = null;
+
+  $scope.password = {
+    newPW: null,
+    newPWConfirm: null,
+    msg: null
+  }
 
   
 
@@ -1004,6 +1010,36 @@ angular.module('starter.controllers', [])
     }
         
   );
+
+  $scope.changePassword = function(){
+    $scope.password.msg = null;
+    if($scope.password.newPW == $scope.password.newPWConfirm){
+      AuthenticationService.changePassword($scope.password.newPW).then(
+        function onSucess(data){
+          console.log("Mudança de senha: " + JSON.stringify(data));
+          $scope.password.msg = "Senha mudada com sucesso!";
+          if(!$scope.$$phase) {
+            $scope.$digest();
+          }
+          
+        },
+        function onError(error){
+          $scope.password.msg = "Erro ao mudar senha, tente novamente.";
+          if(!$scope.$$phase) {
+            $scope.$digest();
+          }
+          
+        })
+    }
+    else{
+      $scope.password.msg = "Senhas diferem, verifique e tente novamente.";
+      if(!$scope.$$phase) {
+        $scope.$digest();
+      }
+      
+    }
+
+  }
 
   $scope.savePicture = function(){
     var imgURI = $scope.imgURI;
