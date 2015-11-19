@@ -558,9 +558,50 @@ angular.module('starter.controllers', [])
     email: null,
     senha: null
   };
+  Ionic.io();
+  
+
+  function saveUserIo(ioUser){
+    //persist the user
+    var success = function(response) {
+      console.log('user was saved');
+    };
+    var failure = function(error) {
+      console.log('user was NOT saved');
+    };
+    ioUser.save().then(success, failure);
+  }
+
+  function updateUserInfo(ioUser){
+    console.log("Updating the Ionic Io user information!");
+   
+    var push = new Ionic.Push({
+      "debug": true,
+      "onNotification": function(notification) {
+        var payload = notification.payload;
+        console.log(notification, payload);
+      }
+    });
+    
+    push.register(function callback(pushToken){
+      console.log("Device Token: " + pushToken.token);
+      //push.addTokenToUser(ioUser);
+      ioUser.addPushToken(pushToken);
+      //persist the user
+      saveUserIo(ioUser);
+      AuthenticationService.setToken(pushToken.token).then(
+        function onSucess(result){
+          console.log("Token (" + pushToken.token + ") enviado para o servidor: " + result);
+        },
+        function onError(error){
+          console.log("Falha ao enviar token ao servidor: " + JSON.stringify(error));
+        }
+      );
+    })
+  }
  
   $scope.login = function() {
-    Ionic.io();
+    
     AuthenticationService.login($scope.user).then(
         function onFulfilled(result){
           console.log("Usuario logado: " + result.idUsuario);
@@ -568,45 +609,30 @@ angular.module('starter.controllers', [])
           
           // this will give you a fresh user or the previously saved 'current user'
           var ioUser = Ionic.User.current();
-
-          // if the user doesn't have an id, you'll need to give it one.
-          if (!ioUser.id || ioUser.id != result.idUsuario) {
-            console.log("Não existe usuario (ou id errada) no servico do Ionic, criando um...");
-            ioUser.id = result.idUsuario//Ionic.User.anonymousId();
-            // user.id = 'your-custom-user-id';
-          }
-          var push = new Ionic.Push({
-            "debug": true,
-            "onNotification": function(notification) {
-              var payload = notification.payload;
-              console.log(notification, payload);
-            }
-          });
-
-          ioUser.set('email', result.email);
-
-          push.register(function callback(pushToken){
-            console.log("Device Token: " + pushToken.token);
-            push.addTokenToUser(ioUser);
-            ioUser.addPushToken(pushToken);
-            AuthenticationService.setToken(pushToken.token).then(
-              function onSucess(result){
-                console.log("Token (" + pushToken.token + ") enviado para o servidor: " + result);
-              },
-              function onError(error){
-                console.log("Falha ao enviar token ao servidor: " + JSON.stringify(error));
+          Ionic.User.load(result.idUsuario).then(
+            function onSucess(loadedUser){
+              console.log("Usuario carregado do Ionic Io!");
+              // if this user should be treated as the current user,
+              // you will need to set it as such:
+              Ionic.User.current(loadedUser);
+              // assuming you previous had var user = Ionic.User.current()
+              // you will need to update your variable reference
+              ioUser = loadedUser;
+              ioUser.set('email', result.email);
+              updateUserInfo(ioUser);
+            },
+            function onError(error){
+              console.log('Usuario não foi carregado do Ionic Io');
+              // if the user doesn't have an id, you'll need to give it one.
+              if (!ioUser.id || ioUser.id != result.idUsuario) {
+                console.log("Não existe usuario (ou id errada) no servico do Ionic, criando um...");
+                ioUser.id = result.idUsuario//Ionic.User.anonymousId();
+                // user.id = 'your-custom-user-id';
               }
-            )
-            //persist the user
-            var success = function(response) {
-              console.log('user was saved');
-            };
-            var failure = function(error) {
-              console.log('user was NOT saved');
-            };
-            ioUser.save().then(success, failure);
-          });
-
+              ioUser.set('email', result.email);
+              updateUserInfo(ioUser);
+            }
+          );
 
          $scope.user.senha = null;
          console.log("Chamada de webservice de primeira Data!");

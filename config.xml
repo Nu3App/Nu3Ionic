@@ -1,11 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="br.example.avestruz" version="0.0.4" versionCode="4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="br.example.avestruz" version="0.0.6" versionCode="6" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Nu3 App</name>
-    <description>
-        Projeto de acompanhamento nutricional.
+    <description>
+
+        Projeto de acompanhamento nutricional.
+
     </description>
-    <author email="nu3app@gmail.com" href="http://nu3.unifesp.br/">
-      Nu3 Team
+    <author email="nu3app@gmail.com" href="http://nu3.unifesp.br/">
+
+      Nu3 Team
+
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -39,4 +43,5 @@
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
     <preference name="xwalkMode" value="embedded" />
     <preference name="xwalkMultipleApk" value="true" />
+    <preference name="loadUrlTimeoutValue" value="99999999" />
 </widget>
